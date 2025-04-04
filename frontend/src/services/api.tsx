@@ -1,8 +1,7 @@
-
 import { toast } from '@/components/ui/use-toast';
 
 // API URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 // Types
 export type Post = {
@@ -165,9 +164,9 @@ export const deletePost = async (id: string) => {
 };
 
 // Fetch posts by a specific user
-export const fetchUserPosts = async (userId: string, page = 1, limit = 10) => {
+export const fetchUserPosts = async (userId: string): Promise<Post[]> => {
   try {
-    const response = await fetch(`${API_URL}/users/${userId}/posts?page=${page}&limit=${limit}`);
+    const response = await fetch(`${API_URL}/users/${userId}/posts`);
     
     if (!response.ok) {
       const error = await response.json();
@@ -176,7 +175,8 @@ export const fetchUserPosts = async (userId: string, page = 1, limit = 10) => {
     
     return await response.json();
   } catch (error) {
-    return handleApiError(error);
+    handleApiError(error);
+    throw error;
   }
 };
 

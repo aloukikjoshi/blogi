@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,19 +7,17 @@ import { Label } from '@/components/ui/label';
 import { Loader } from 'lucide-react';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
   const { login, loading } = useAuth();
   const navigate = useNavigate();
 
   const validate = () => {
-    const newErrors: { email?: string; password?: string } = {};
+    const newErrors: { username?: string; password?: string } = {};
     
-    if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
+    if (!username) {
+      newErrors.username = 'Username is required';
     }
     
     if (!password) {
@@ -39,7 +36,7 @@ const Login = () => {
     }
     
     try {
-      await login(email, password);
+      await login(username, password);
       navigate('/');
     } catch (error) {
       // Error is handled in AuthContext
@@ -67,21 +64,21 @@ const Login = () => {
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <Label htmlFor="email">
-                Email address
+              <Label htmlFor="username">
+                Username
               </Label>
               <div className="mt-1">
                 <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className={errors.email ? 'border-red-500' : ''}
+                  id="username"
+                  name="username"
+                  type="text"
+                  autoComplete="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className={errors.username ? 'border-red-500' : ''}
                 />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                {errors.username && (
+                  <p className="mt-1 text-sm text-red-600">{errors.username}</p>
                 )}
               </div>
             </div>

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,10 +29,11 @@ const Header = () => {
   };
 
   const getInitials = (name?: string, username?: string) => {
-    if (name && name.length > 0) {
-      return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    // Always use the first letter of the username
+    if (username && username.length > 0) {
+      return username[0].toUpperCase();
     }
-    return username ? username[0].toUpperCase() : 'U';
+    return 'U';
   };
 
   return (
@@ -84,23 +84,11 @@ const Header = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to="/profile" className="flex items-center w-full cursor-pointer">
-                        <User className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
+                      <Link to="/logout" className="flex items-center w-full cursor-pointer">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Log out</span>
                       </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/settings" className="flex items-center w-full cursor-pointer">
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Settings</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout} className="flex items-center cursor-pointer">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

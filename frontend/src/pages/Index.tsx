@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -7,12 +6,14 @@ import PostGrid from '@/components/posts/PostGrid';
 import { Button } from '@/components/ui/button';
 import { fetchPosts, Post } from '@/services/api';
 import { Loader } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext'; // Add this import
 
 const Index = () => {
   const [featuredPost, setFeaturedPost] = useState<Post | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth(); // Get the actual user from AuthContext
   
   useEffect(() => {
     const loadPosts = async () => {
@@ -79,9 +80,9 @@ const Index = () => {
               </Button>
             </Link>
             <Link to="/explore">
-              <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-blogi-800 font-medium">
+                <Button variant="outline" size="lg" className="border-blogi-900 text-blogi-900 hover:bg-blogi-900 hover:text-white font-medium">
                 Explore Posts
-              </Button>
+                </Button>
             </Link>
           </div>
         </div>
@@ -118,19 +119,21 @@ const Index = () => {
       </section>
       
       {/* CTA Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4 text-gray-900">Ready to share your story?</h2>
-          <p className="text-xl text-gray-600 mb-6 max-w-2xl mx-auto">
-            Join our community of writers and readers to share your unique voice with the world.
-          </p>
-          <Link to="/register">
-            <Button size="lg" className="font-medium">
-              Create an Account
-            </Button>
-          </Link>
-        </div>
-      </section>
+      {!user && (
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl font-bold mb-4 text-gray-900">Ready to share your story?</h2>
+            <p className="text-xl text-gray-600 mb-6 max-w-2xl mx-auto">
+              Join our community of writers and readers to share your unique voice with the world.
+            </p>
+            <Link to="/register">
+              <Button size="lg" className="font-medium">
+                Create an Account
+              </Button>
+            </Link>
+          </div>
+        </section>
+      )}
     </Layout>
   );
 };

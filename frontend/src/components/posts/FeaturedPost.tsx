@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,17 @@ import { formatDistanceToNow } from 'date-fns';
 type FeaturedPostProps = {
   post: Post;
 };
+
+// Define a type for tag objects
+type TagObject = {
+  name: string;
+  [key: string]: any;
+};
+
+// Type guard to check if a tag is an object with a name property
+function isTagObject(tag: any): tag is TagObject {
+  return typeof tag === 'object' && tag !== null && 'name' in tag;
+}
 
 const FeaturedPost = ({ post }: FeaturedPostProps) => {
   const {
@@ -48,17 +58,20 @@ const FeaturedPost = ({ post }: FeaturedPostProps) => {
         
         <div className="p-6 md:w-1/2 flex flex-col">
           <div className="flex-grow">
-            {tags.length > 0 && (
+            {tags && tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-3">
-                {tags.slice(0, 3).map((tag, index) => (
-                  <Link 
-                    key={index} 
-                    to={`/tag/${tag}`}
-                    className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full hover:bg-blogi-100 transition-colors"
-                  >
-                    {tag}
-                  </Link>
-                ))}
+                {tags
+                  .filter((tag): tag is NonNullable<typeof tag> => tag !== null && tag !== undefined)
+                  .slice(0, 3)
+                  .map((tag, index) => (
+                    <Link 
+                      key={index} 
+                      to={`/tag/${isTagObject(tag) ? tag.name : String(tag)}`}
+                      className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full hover:bg-blogi-100 transition-colors"
+                    >
+                      {isTagObject(tag) ? tag.name : String(tag)}
+                    </Link>
+                  ))}
               </div>
             )}
             

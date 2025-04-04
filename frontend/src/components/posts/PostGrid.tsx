@@ -1,6 +1,4 @@
-
 import { useState, useEffect } from 'react';
-import PostCard from './PostCard';
 import { Post, fetchPosts } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Loader } from 'lucide-react';
@@ -90,7 +88,13 @@ const PostGrid = ({
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <div key={post.id} className="border rounded-lg p-4 shadow-sm">
+            <h3 className="text-lg font-semibold">{post.title}</h3>
+            <p className="text-sm text-gray-600 mt-2">{post.excerpt || post.content?.substring(0, 100)}</p>
+            <div className="mt-4">
+              <a href={`/post/${post.id}`} className="text-blogi-600 hover:underline">Read more</a>
+            </div>
+          </div>
         ))}
       </div>
       
