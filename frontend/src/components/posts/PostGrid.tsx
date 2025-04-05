@@ -6,6 +6,8 @@ import { DeletePostButton } from '@/components/posts/DeletePostButton';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link } from 'react-router-dom';
+import { PostActions } from './PostActions';
+import { useAuth } from '@/contexts/AuthContext';
 
 type PostGridProps = {
   initialPosts?: Post[];
@@ -20,6 +22,7 @@ const PostGrid = ({
   showLoadMore = true,
   showEditDelete = false,
 }: PostGridProps) => {
+  const { user } = useAuth(); // Get the current user
   const [posts, setPosts] = useState<Post[]>(initialPosts || []);
   const [loading, setLoading] = useState(!initialPosts);
   const [error, setError] = useState<string | null>(null);
@@ -104,8 +107,20 @@ const PostGrid = ({
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {posts.map((post) => (
-          <div key={post.id} className="border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="text-xl font-semibold mb-3">
+          <div key={post.id} className="border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow relative">
+            {/* Only show edit/delete options if showEditDelete is true AND 
+                the current user is the post author */}
+            {showEditDelete && user && post.author.id === user.id && (
+              <PostActions 
+                postId={post.id} 
+                onDelete={() => {
+                  // Remove the post from the local state after deletion
+                  setPosts(posts.filter(p => p.id !== post.id));
+                }} 
+              />
+            )}
+
+            <h3 className="text-xl font-semibold mb-3 pr-8">
               <Link to={`/post/${post.slug}`} className="hover:text-blogi-600 transition-colors">
                 {post.title}
               </Link>
@@ -132,35 +147,16 @@ const PostGrid = ({
               {post.excerpt || post.content.substring(0, 100)}...
             </p>
             
-            <div className="flex items-center justify-between text-sm text-gray-500">
+            <div className="flex items-center justify-between text-sm text-gray-500 mt-4">
               <span>
-                Created: {format(new Date(post.published_at), 'MMM d, yyyy')}
+                {format(new Date(post.published_at), 'MMM d, yyyy')}
               </span>
-              {(post as any).updated_at && (post as any).updated_at !== post.published_at && (
-                <span>
-                  Updated: {format(new Date((post as any).updated_at), 'MMM d, yyyy')}
+              {post.updated_at && new Date(post.updated_at).getTime() > new Date(post.published_at).getTime() + 60000 && (
+                <span className="text-gray-500 italic">
+                  Edited {format(new Date(post.updated_at), 'MMM d, yyyy')}
                 </span>
               )}
             </div>
-
-            {showEditDelete && (
-              <div className="flex gap-2 mt-4">
-                <Link to={`/edit/${post.id}`}>
-                  <Button variant="outline" size="sm">
-                    <Edit2 className="h-4 w-4 mr-2" />
-                    Edit
-                  </Button>
-                </Link>
-                <DeletePostButton 
-                  postId={post.id} 
-                  onDelete={() => {
-                    // Remove the post from the local state after deletion
-                    setPosts(posts.filter(p => p.id !== post.id));
-                    // Show a success toast if you want
-                  }} 
-                />
-              </div>
-            )}
           </div>
         ))}
       </div>

@@ -32,6 +32,7 @@ class PostInDB(PostBase):
     slug: str
     published_at: datetime
     author_id: str
+    updated_at: Optional[datetime] = None  # Add updated_at field
     
     class Config:
         orm_mode = True

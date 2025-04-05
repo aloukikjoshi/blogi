@@ -20,7 +20,6 @@ const Terms = () => {
             <p>
               <strong>"Blogi"</strong> refers to our website, services, and content.<br />
               <strong>"User"</strong> refers to an individual who has registered with Blogi.<br />
-              <strong>"Content"</strong> refers to any text, images, videos, or other material posted on Blogi.
             </p>
             
             <h2 className="text-xl font-semibold mt-8 mb-4">3. Account Registration</h2>

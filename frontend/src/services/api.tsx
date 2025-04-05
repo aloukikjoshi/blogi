@@ -13,22 +13,23 @@ const api = axios.create({
 });
 
 // Types
-export type Post = {
+export interface Post {
   id: string;
   title: string;
   content: string;
-  excerpt: string;
-  featured_image?: string;
-  published_at: string;
+  excerpt?: string;
   slug: string;
+  published_at: string;
+  updated_at?: string; // Add this properly to your interface
   author: {
     id: string;
     username: string;
     name?: string;
     avatar?: string;
   };
-  tags?: string[];
-};
+  tags?: Array<{ name: string }>;
+  // other properties...
+}
 
 export type CreatePostData = {
   title: string;
@@ -170,29 +171,39 @@ export const fetchUserProfile = async (userId: string) => {
 
 // Delete a post
 export const deletePost = async (postId: string) => {
-  const token = getToken();
+  const token = localStorage.getItem('token');
   
   if (!token) {
-    throw new Error('You must be logged in to delete a post');
+    throw new Error('Authentication required');
   }
   
-  try {
-    const response = await fetch(`${API_URL}/posts/${postId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || 'Failed to delete post');
+  const response = await fetch(`${API_URL}/posts/${postId}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  
+  if (!response.ok) {
+    // Don't try to parse response as JSON if status is 204
+    if (response.status === 404) {
+      throw new Error('Post not found or you do not have permission to delete it');
     }
     
-    return true;
-  } catch (error) {
-    return handleApiError(error);
+    // Only try to parse as JSON if there's likely to be a response body
+    if (response.status !== 204 && response.headers.get('content-length') !== '0') {
+      try {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to delete post');
+      } catch (e) {
+        throw new Error(`Failed to delete post: Status ${response.status}`);
+      }
+    } else {
+      throw new Error(`Failed to delete post: Status ${response.status}`);
+    }
   }
+  
+  return true;
 };
 
 // Add this function to fetch posts for a specific user

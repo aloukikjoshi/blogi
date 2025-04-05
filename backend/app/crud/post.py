@@ -138,19 +138,36 @@ def update_post(db: Session, post_id: str, post_update: PostUpdate, user_id: str
         db_post.tags = tag_objects
         update_data.pop("tags")
     
+    # Update the fields
     for field, value in update_data.items():
         setattr(db_post, field, value)
+    
+    # The updated_at field will be automatically updated by SQLAlchemy
+    # due to onupdate=func.now() in the model
     
     db.commit()
     db.refresh(db_post)
     return db_post
 
 def delete_post(db: Session, post_id: str, user_id: str):
-    db_post = get_post(db, post_id)
+    print(f"Attempting to delete post {post_id} by user {user_id}")
     
-    if not db_post or db_post.author_id != user_id:
-        return False
-    
-    db.delete(db_post)
-    db.commit()
-    return True
+    try:
+        db_post = db.query(Post).filter(Post.id == post_id).first()
+        
+        if not db_post:
+            print(f"Post {post_id} not found")
+            return False
+        
+        if db_post.author_id != user_id:
+            print(f"User {user_id} is not the author of post {post_id}. Author is {db_post.author_id}")
+            return False
+        
+        print(f"Deleting post {post_id}")
+        db.delete(db_post)
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error deleting post: {str(e)}")
+        db.rollback()
+        raise e

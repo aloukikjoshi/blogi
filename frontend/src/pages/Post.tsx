@@ -1,39 +1,28 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import Layout from '@/components/layout/Layout';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { fetchPost, Post as PostType } from '@/services/api';
+import { fetchPost } from '@/services/api';
 import { Loader } from 'lucide-react';
-import { Edit2 } from 'lucide-react';
-import { DeletePostButton } from '@/components/posts/DeletePostButton';
-import { useAuth } from '../hooks/useAuth';
-
-export interface Post {
-  id: number;
-  title: string;
-  content: string;
-  published_at: string;
-  updated_at?: string;
-  featured_image?: string;
-  author: {
-    id: number;
-    username: string;
-    name?: string;
-    avatar?: string;
-  };
-  tags?: (string | { name: string })[];
-}
+import { useAuth } from '@/contexts/AuthContext';
+import { PostActions } from '@/components/posts/PostActions';
 
 const Post = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const [post, setPost] = useState<Post | null>(null);
+  const [post, setPost] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const currentUser = useAuth(); // Implement useAuth hook
+  const { user } = useAuth();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
+  // Check if current user is the author
+  const isAuthor = user && post && user.id === post.author.id;
+
+  // Load post data
   useEffect(() => {
     const loadPost = async () => {
       if (!slug) return;
@@ -80,75 +69,82 @@ const Post = () => {
   return (
     <Layout>
       <article className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Featured image if it exists */}
         {post.featured_image && (
-          <div className="mb-8 rounded-lg overflow-hidden">
-            <img 
-              src={post.featured_image} 
+          <div className="mb-8">
+            <img
+              src={post.featured_image}
               alt={post.title}
-              className="w-full h-[400px] object-cover"
+              className="w-full h-auto rounded-lg object-cover"
+              style={{ maxHeight: '500px' }}
             />
           </div>
         )}
 
-        <header className="mb-8">
-          {post.tags && post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-4">
-              {post.tags.map((tag, index) => (
-                <Link
-                  key={index}
-                  to={`/tag/${typeof tag === 'string' ? tag : (tag as { name: string }).name}`}
-                  className="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded-full hover:bg-blogi-100 transition-colors"
-                >
-                  {typeof tag === 'string' ? tag : (tag as { name: string }).name}
-                </Link>
-              ))}
-            </div>
-          )}
-
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>
-
-          <div className="flex items-center space-x-4">
-            <Link to={`/profile/${post.author.id}`} className="flex items-center">
-              <Avatar className="h-10 w-10 mr-3">
-                <AvatarImage src={post.author.avatar} />
-                <AvatarFallback>
-                  {post.author.name?.[0] || post.author.username[0]}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium text-gray-900">
-                  {post.author.name || post.author.username}
-                </p>
-                <div className="text-sm text-gray-500">
-                  <time dateTime={post.published_at}>
-                    {format(new Date(post.published_at), 'MMMM d, yyyy')}
-                  </time>
-                  {post.updated_at && post.updated_at !== post.published_at && (
-                    <span> • Updated {format(new Date(post.updated_at), 'MMMM d, yyyy')}</span>
-                  )}
-                </div>
+        <header className="mb-8 relative">
+          {/* Post title */}
+          <div className="flex justify-between items-start">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4 pr-12">
+              {post.title}
+            </h1>
+            
+            {/* Position the PostActions menu in the top-right of the post header */}
+            {isAuthor && (
+              <div className="absolute top-0 right-0">
+                <PostActions 
+                  postId={post.id} 
+                  onDelete={() => navigate('/')}
+                />
               </div>
-            </Link>
+            )}
           </div>
 
-          {currentUser && post.author.id === currentUser.id && (
-            <div className="flex gap-4 mt-4">
-              <Link to={`/edit/${post.id}`}>
-                <Button variant="outline" size="sm">
-                  <Edit2 className="h-4 w-4 mr-2" />
-                  Edit Post
-                </Button>
-              </Link>
-              <DeletePostButton postId={post.id.toString()} onDelete={() => navigate('/')} />
+          {/* Author info */}
+          <div className="flex items-center mb-6">
+            <Avatar className="h-10 w-10 mr-3">
+              <AvatarImage src={post.author.avatar} />
+              <AvatarFallback>
+                {post.author.name?.[0] || post.author.username[0]}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-medium text-gray-900">
+                {post.author.name || post.author.username}
+              </p>
+              <p className="text-sm text-gray-500">
+                {format(new Date(post.published_at), 'MMMM d, yyyy')}
+              </p>
+            </div>
+          </div>
+
+          {/* Tags */}
+          {post.tags && post.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {post.tags.map((tag) => (
+                <span
+                  key={tag.name}
+                  className="bg-gray-100 text-gray-800 text-xs px-3 py-1 rounded-full"
+                >
+                  {tag.name}
+                </span>
+              ))}
             </div>
           )}
         </header>
 
+        {/* Post content */}
         <div className="prose prose-lg max-w-none blog-content">
           {post.content.split('\n').map((paragraph, index) => (
             paragraph ? <p key={index}>{paragraph}</p> : <br key={index} />
           ))}
         </div>
+
+        {/* Show edit timestamp */}
+        {post.updated_at && new Date(post.updated_at).getTime() > new Date(post.published_at).getTime() + 60000 && (
+          <div className="text-sm text-gray-500 italic mt-6 pt-4 border-t border-gray-200">
+            This post was last edited on {format(new Date(post.updated_at), 'MMMM d, yyyy')} at {format(new Date(post.updated_at), 'h:mm a')}
+          </div>
+        )}
       </article>
     </Layout>
   );
