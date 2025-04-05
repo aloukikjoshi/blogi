@@ -11,21 +11,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Menu, X, User, Settings, LogOut, Search, PenTool } from 'lucide-react';
+import { Menu, X, User, Settings, LogOut, PenTool } from 'lucide-react';
 
 const Header = () => {
   const { user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Redirect to search page with query
-    window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
   };
 
   const getInitials = (name?: string, username?: string) => {
@@ -52,18 +45,6 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-8">
             <Link to="/" className="text-gray-700 hover:text-blogi-600 transition-colors">Home</Link>
             <Link to="/explore" className="text-gray-700 hover:text-blogi-600 transition-colors">Explore</Link>
-            <form onSubmit={handleSearch} className="relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="py-1 px-3 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blogi-500 focus:border-transparent"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <button type="submit" className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400">
-                <Search size={16} />
-              </button>
-            </form>
           </nav>
 
           {/* User Menu (Desktop) */}
@@ -127,20 +108,6 @@ const Header = () => {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden py-4 space-y-4">
-            <div className="flex justify-center py-2">
-              <form onSubmit={handleSearch} className="relative w-full">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="w-full py-2 px-3 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blogi-500 focus:border-transparent"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button type="submit" className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <Search size={18} />
-                </button>
-              </form>
-            </div>
             <Link
               to="/"
               className="block py-2 text-center text-gray-700 hover:text-blogi-600"
