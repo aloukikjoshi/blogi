@@ -36,6 +36,9 @@ const Header = () => {
     return 'U';
   };
 
+  // Add a check for user existence
+  const userId = user?.id;
+
   return (
     <header className="bg-white shadow-sm sticky top-0 z-10">
       <div className="container mx-auto px-4 py-3">
@@ -84,6 +87,12 @@ const Header = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuItem asChild>
+                      <Link to={`/profile/${userId}`} className="flex items-center w-full">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/logout" className="flex items-center w-full cursor-pointer">
                         <LogOut className="mr-2 h-4 w-4" />

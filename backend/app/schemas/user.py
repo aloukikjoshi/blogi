@@ -1,4 +1,5 @@
 from typing import Optional
+from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field
 
 class UserBase(BaseModel):
@@ -22,6 +23,7 @@ class UserUpdate(BaseModel):
 class UserInDB(UserBase):
     id: str
     is_active: bool = True
+    created_at: datetime  # Add created_at field here
 
     class Config:
         orm_mode = True

@@ -14,6 +14,11 @@ import Privacy from './pages/Privacy';
 import Cookies from './pages/Cookies';
 import CreatePost from './pages/CreatePost';
 import Logout from './pages/Logout';
+import Explore from '@/pages/Explore';
+import Post from './pages/Post';
+import EditPost from './pages/EditPost';
+import Profile from './pages/Profile';
+import UserProfile from './pages/UserProfile';
 
 const queryClient = new QueryClient();
 
@@ -37,7 +42,15 @@ const App = () => (
               </RequireAuth>
             } />
             <Route path="/logout" element={<Logout />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/post/:slug" element={<Post />} />
+            <Route path="/edit/:id" element={
+              <RequireAuth>
+                <EditPost />
+              </RequireAuth>
+            } />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/:userId" element={<UserProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

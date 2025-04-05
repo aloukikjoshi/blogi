@@ -1,18 +1,24 @@
 import { useState, useEffect } from 'react';
 import { Post, fetchPosts } from '@/services/api';
 import { Button } from '@/components/ui/button';
-import { Loader } from 'lucide-react';
+import { Loader, Edit2 } from 'lucide-react';
+import { DeletePostButton } from '@/components/posts/DeletePostButton';
+import { format } from 'date-fns';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Link } from 'react-router-dom';
 
 type PostGridProps = {
   initialPosts?: Post[];
   userId?: string;
   showLoadMore?: boolean;
+  showEditDelete?: boolean;
 };
 
 const PostGrid = ({
   initialPosts,
   userId,
   showLoadMore = true,
+  showEditDelete = false,
 }: PostGridProps) => {
   const [posts, setPosts] = useState<Post[]>(initialPosts || []);
   const [loading, setLoading] = useState(!initialPosts);
@@ -25,16 +31,16 @@ const PostGrid = ({
     setError(null);
     
     try {
-      // Use fetchPosts from api service
-      const response = await fetchPosts(pageNum);
+      // Pass userId parameter to filter posts by user
+      const response = await fetchPosts(pageNum, 10, userId);
       
       if (pageNum === 1) {
-        setPosts(response.items);
+        setPosts(response.items || []);
       } else {
-        setPosts(prev => [...prev, ...response.items]);
+        setPosts(prev => [...prev, ...(response.items || [])]);
       }
       
-      setHasMore(response.total > posts.length + response.items.length);
+      setHasMore((response.total || 0) > (pageNum * 10));
     } catch (err: any) {
       console.error('Failed to load posts:', err);
       setError(err.message || 'Failed to load posts');
@@ -44,10 +50,11 @@ const PostGrid = ({
   };
   
   useEffect(() => {
+    // Reload posts when userId changes or when not using initialPosts
     if (!initialPosts) {
-      loadPosts();
+      loadPosts(1);
     }
-  }, [initialPosts]);
+  }, [initialPosts, userId]); // Add userId dependency
   
   const handleLoadMore = () => {
     const nextPage = page + 1;
@@ -79,7 +86,9 @@ const PostGrid = ({
     return (
       <div className="text-center py-16">
         <h3 className="text-lg font-medium text-gray-900 mb-2">No posts found</h3>
-        <p className="text-gray-600">Check back later for new content</p>
+        <p className="text-gray-600">
+          {userId ? "This user hasn't published any posts yet." : "Check back later for new content"}
+        </p>
       </div>
     );
   }
@@ -88,12 +97,62 @@ const PostGrid = ({
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {posts.map((post) => (
-          <div key={post.id} className="border rounded-lg p-4 shadow-sm">
-            <h3 className="text-lg font-semibold">{post.title}</h3>
-            <p className="text-sm text-gray-600 mt-2">{post.excerpt || post.content?.substring(0, 100)}</p>
-            <div className="mt-4">
-              <a href={`/post/${post.id}`} className="text-blogi-600 hover:underline">Read more</a>
+          <div key={post.id} className="border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+            <h3 className="text-xl font-semibold mb-3">
+              <Link to={`/post/${post.slug}`} className="hover:text-blogi-600 transition-colors">
+                {post.title}
+              </Link>
+            </h3>
+            
+            <div className="flex items-center mb-4">
+              <Avatar className="h-8 w-8 mr-3">
+                <AvatarImage src={post.author.avatar} />
+                <AvatarFallback>
+                  {post.author.name?.[0] || post.author.username[0]}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <Link 
+                  to={`/profile/${post.author.id}`}
+                  className="text-sm font-medium hover:text-blogi-600"
+                >
+                  {post.author.name || post.author.username}
+                </Link>
+              </div>
             </div>
+            
+            <p className="text-sm text-gray-600 mb-4">
+              {post.excerpt || post.content.substring(0, 100)}...
+            </p>
+            
+            <div className="flex items-center justify-between text-sm text-gray-500">
+              <span>
+                Created: {format(new Date(post.published_at), 'MMM d, yyyy')}
+              </span>
+              {(post as any).updated_at && (post as any).updated_at !== post.published_at && (
+                <span>
+                  Updated: {format(new Date((post as any).updated_at), 'MMM d, yyyy')}
+                </span>
+              )}
+            </div>
+
+            {showEditDelete && (
+              <div className="flex gap-2 mt-4">
+                <Link to={`/edit/${post.id}`}>
+                  <Button variant="outline" size="sm">
+                    <Edit2 className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                </Link>
+                <DeletePostButton 
+                  postId={post.id} 
+                  onDelete={() => {
+                    // Remove the post from the local state after deletion
+                    setPosts(posts.filter(p => p.id !== post.id));
+                  }} 
+                />
+              </div>
+            )}
           </div>
         ))}
       </div>

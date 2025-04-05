@@ -19,13 +19,13 @@ const Index = () => {
     const loadPosts = async () => {
       try {
         setLoading(true);
+        // Change limit to 7 (6 regular + 1 featured)
         const response = await fetchPosts(1, 7);
         
         if (response.items && response.items.length > 0) {
-          // Set the first post as featured
           setFeaturedPost(response.items[0]);
-          // Set the rest as regular posts
-          setPosts(response.items.slice(1));
+          // Only take next 6 posts
+          setPosts(response.items.slice(1, 7));
         }
       } catch (err: any) {
         console.error('Failed to load posts:', err);

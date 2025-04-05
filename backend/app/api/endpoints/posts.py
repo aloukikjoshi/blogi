@@ -84,25 +84,3 @@ async def delete_post_endpoint(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Post not found or you don't have permission to delete it"
         )
-
-@router.post("/media/upload", status_code=status.HTTP_201_CREATED)
-async def upload_media(
-    file: UploadFile = File(...),
-    current_user: User = Depends(get_current_user)
-):
-    # Create uploads directory if it doesn't exist
-    upload_dir = os.path.join("static", "uploads")
-    os.makedirs(upload_dir, exist_ok=True)
-    
-    # Create a unique filename
-    file_extension = os.path.splitext(file.filename)[1]
-    unique_filename = f"{uuid4()}{file_extension}"
-    file_path = os.path.join(upload_dir, unique_filename)
-    
-    # Write the file
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    
-    # Return the URL to access the file
-    file_url = f"/static/uploads/{unique_filename}"
-    return {"url": file_url}

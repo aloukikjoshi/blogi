@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,18 +7,53 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { createPost } from '@/services/api';
+import { fetchPost, updatePost } from '@/services/api';
 import { Loader } from 'lucide-react';
 
-const CreatePost = () => {
+const EditPost = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [excerpt, setExcerpt] = useState('');
   const [tags, setTags] = useState<string>('');
   const [loading, setLoading] = useState(false);
-  
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const [loadingPost, setLoadingPost] = useState(true);
+
+  useEffect(() => {
+    const loadPost = async () => {
+      try {
+        if (!id) return;
+        const post = await fetchPost(id);
+        
+        setTitle(post.title);
+        setContent(post.content);
+        setExcerpt(post.excerpt || '');
+        
+        // Handle tags - could be array of objects or array of strings
+        if (post.tags && post.tags.length > 0) {
+          if (typeof post.tags[0] === 'object') {
+            setTags(post.tags.map((tag: any) => tag.name).join(', '));
+          } else {
+            setTags(post.tags.join(', '));
+          }
+        }
+      } catch (error: any) {
+        toast({
+          title: "Error loading post",
+          description: error.message,
+          variant: "destructive"
+        });
+        navigate('/');
+      } finally {
+        setLoadingPost(false);
+      }
+    };
+
+    loadPost();
+  }, [id, navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,17 +82,17 @@ const CreatePost = () => {
         tags: tagsArray.length > 0 ? tagsArray : undefined
       };
       
-      const newPost = await createPost(postData);
+      await updatePost(id!, postData);
       
       toast({
-        title: "Post created successfully",
-        description: "Your post has been published"
+        title: "Post updated successfully",
+        description: "Your changes have been saved"
       });
       
-      navigate('/');
+      navigate(`/post/${id}`);
     } catch (error: any) {
       toast({
-        title: "Failed to create post",
+        title: "Failed to update post",
         description: error.message,
         variant: "destructive"
       });
@@ -66,10 +101,20 @@ const CreatePost = () => {
     }
   };
 
+  if (loadingPost) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center py-32">
+          <Loader className="h-10 w-10 animate-spin text-blogi-600" />
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Create New Post</h1>
+        <h1 className="text-3xl font-bold mb-8">Edit Post</h1>
         
         <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto">
           <div>
@@ -136,10 +181,10 @@ const CreatePost = () => {
             {loading ? (
               <>
                 <Loader className="mr-2 h-4 w-4 animate-spin" />
-                Publishing...
+                Updating...
               </>
             ) : (
-              'Publish Post'
+              'Update Post'
             )}
           </Button>
         </form>
@@ -148,4 +193,4 @@ const CreatePost = () => {
   );
 };
 
-export default CreatePost;
+export default EditPost;

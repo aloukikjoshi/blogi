@@ -104,7 +104,7 @@ const Footer = () => {
             <Heart className="h-4 w-4 text-red-500 mx-1 fill-current" />
             <span>by</span>
             <a 
-              href="https://github.com/AloukikJoshi" 
+              href="https://github.com/aloukikjoshi" 
               target="_blank" 
               rel="noopener noreferrer"
               className="font-medium text-blogi-600 hover:text-blogi-500 hover:underline ml-1"

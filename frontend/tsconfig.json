@@ -27,14 +27,7 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@components/*": ["src/components/*"],
-      "@hooks/*": ["src/hooks/*"],
-      "@utils/*": ["src/utils/*"],
-      "@styles/*": ["src/styles/*"],
-      "@assets/*": ["src/assets/*"],
-      "@context/*": ["src/context/*"],
-      "@pages/*": ["src/pages/*"]
+      "@/*": ["src/*"]
     }
   },
   "include": ["src"],

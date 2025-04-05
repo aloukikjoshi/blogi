@@ -1,7 +1,16 @@
 import { toast } from '@/components/ui/use-toast';
+import axios from 'axios';
 
 // API URL
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
 
 // Types
 export type Post = {
@@ -46,10 +55,17 @@ const handleApiError = (error: any) => {
   throw error;
 };
 
-// Fetch all posts (with optional pagination)
-export const fetchPosts = async (page = 1, limit = 10) => {
+// Fetch all posts (with optional pagination and userId filter)
+export const fetchPosts = async (page = 1, limit = 10, userId?: string) => {
   try {
-    const response = await fetch(`${API_URL}/posts?page=${page}&limit=${limit}`);
+    let url = `${API_URL}/posts?page=${page}&limit=${limit}&sort=-published_at`;
+    
+    // Add userId filter if provided
+    if (userId) {
+      url += `&author_id=${userId}`;
+    }
+    
+    const response = await fetch(url);
     
     if (!response.ok) {
       const error = await response.json();
@@ -107,8 +123,8 @@ export const createPost = async (postData: CreatePostData) => {
   }
 };
 
-// Update an existing post
-export const updatePost = async (id: string, postData: UpdatePostData) => {
+// Update a post
+export const updatePost = async (postId: string, postData: UpdatePostData) => {
   const token = getToken();
   
   if (!token) {
@@ -116,7 +132,7 @@ export const updatePost = async (id: string, postData: UpdatePostData) => {
   }
   
   try {
-    const response = await fetch(`${API_URL}/posts/${id}`, {
+    const response = await fetch(`${API_URL}/posts/${postId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -136,8 +152,24 @@ export const updatePost = async (id: string, postData: UpdatePostData) => {
   }
 };
 
+// Fetch user profile
+export const fetchUserProfile = async (userId: string) => {
+  try {
+    const response = await fetch(`${API_URL}/users/${userId}`);
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Failed to fetch user profile');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
 // Delete a post
-export const deletePost = async (id: string) => {
+export const deletePost = async (postId: string) => {
   const token = getToken();
   
   if (!token) {
@@ -145,7 +177,7 @@ export const deletePost = async (id: string) => {
   }
   
   try {
-    const response = await fetch(`${API_URL}/posts/${id}`, {
+    const response = await fetch(`${API_URL}/posts/${postId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -158,70 +190,6 @@ export const deletePost = async (id: string) => {
     }
     
     return true;
-  } catch (error) {
-    return handleApiError(error);
-  }
-};
-
-// Fetch posts by a specific user
-export const fetchUserPosts = async (userId: string): Promise<Post[]> => {
-  try {
-    const response = await fetch(`${API_URL}/users/${userId}/posts`);
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || 'Failed to fetch user posts');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    handleApiError(error);
-    throw error;
-  }
-};
-
-// Search posts by query
-export const searchPosts = async (query: string, page = 1, limit = 10) => {
-  try {
-    const response = await fetch(`${API_URL}/posts/search?q=${encodeURIComponent(query)}&page=${page}&limit=${limit}`);
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || 'Failed to search posts');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    return handleApiError(error);
-  }
-};
-
-// Upload image for a post
-export const uploadImage = async (file: File) => {
-  const token = getToken();
-  
-  if (!token) {
-    throw new Error('You must be logged in to upload images');
-  }
-  
-  const formData = new FormData();
-  formData.append('file', file);
-  
-  try {
-    const response = await fetch(`${API_URL}/media/upload`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-      body: formData,
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || 'Failed to upload image');
-    }
-    
-    return await response.json();
   } catch (error) {
     return handleApiError(error);
   }

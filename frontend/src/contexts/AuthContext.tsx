@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
-import { API_URL } from '@/services/api'; // Import API_URL from api service
+import { API_URL } from '@/services/api';
+import { jwtDecode } from 'jwt-decode';
 
 // Define types
 type User = {
@@ -12,12 +13,18 @@ type User = {
   avatar?: string;
 };
 
+type LoginCredentials = {
+  username: string;
+  password: string;
+};
+
 type AuthContextType = {
   user: User | null;
   token: string | null;
   loading: boolean;
   error: string | null;
-  login: (username: string, password: string) => Promise<void>;  // Changed parameter name
+  isAuthenticated: boolean;
+  login: (username: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   updateUserProfile: (userData: Partial<User>) => Promise<void>;
@@ -31,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const { toast } = useToast();
 
   // Check if user is already logged in
@@ -42,6 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setToken(storedToken);
       try {
         setUser(JSON.parse(storedUser));
+        setIsAuthenticated(true);
       } catch (err) {
         console.error('Failed to parse user from localStorage', err);
       }
@@ -56,65 +65,92 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     
     try {
-      console.log("Attempting login with:", { username });
+      console.log('Attempting login with:', username);
       
-      // Create form data instead of JSON
-      const formData = new URLSearchParams();
+      // Use FormData instead of JSON
+      const formData = new FormData();
       formData.append('username', username);
       formData.append('password', password);
       
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: formData.toString(),
+        body: formData,
+        // Do NOT set Content-Type header with FormData - browser sets it automatically with boundary
       });
       
-      console.log("Login response status:", response.status);
-      const data = await response.json();
-      console.log("Login response data:", data);
+      console.log('Login response status:', response.status);
       
       if (!response.ok) {
-        throw data; // Throw the actual error object instead of creating a new Error
+        const errorData = await response.json();
+        console.log('Error response:', errorData);
+        
+        if (errorData.detail) {
+          throw new Error(
+            typeof errorData.detail === 'string' 
+              ? errorData.detail 
+              : JSON.stringify(errorData.detail)
+          );
+        } else {
+          throw new Error('Login failed. Please check your credentials.');
+        }
       }
       
-      // Extract user info safely
-      const userData = data.user || {};
-      const displayName = userData.username || 'user';
-
-      // Save token and user to localStorage
+      const data = await response.json();
+      console.log('Login response data:', data);
+      
+      if (!data.access_token) {
+        throw new Error('No access token received');
+      }
+      
+      // Store the token
       localStorage.setItem('token', data.access_token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      
       setToken(data.access_token);
-      setUser(userData);
       
-      toast({
-        title: 'Login successful',
-        description: `Welcome back, ${displayName}!`,
-      });
-    } catch (err: any) {
-      console.error("Login error:", err);
-      
-      let errorMessage = 'Failed to login';
-      
-      // Better error handling for different types of errors
-      if (err.message) {
-        errorMessage = err.message;
-      } else if (typeof err === 'object' && err !== null) {
-        // Try to extract a meaningful message from the error object
-        errorMessage = err.detail || err.error || JSON.stringify(err);
+      // If user info is returned with the token response
+      if (data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setUser(data.user);
+      } else {
+        // Fetch user data separately if needed
+        await fetchUserProfile();
       }
       
-      setError(errorMessage);
-      toast({
-        title: 'Login failed',
-        description: errorMessage,
-        variant: 'destructive',
-      });
+      setIsAuthenticated(true);
+      
+    } catch (error: any) {
+      console.error('Login error:', error);
+      setError(error.message);
+      throw error;
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Add this function to fetch user profile after login
+  const fetchUserProfile = async () => {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('No token available');
+    }
+    
+    try {
+      const response = await fetch(`${API_URL}/users/me`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch user profile');
+      }
+      
+      const userData = await response.json();
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+    } catch (error) {
+      console.error('Profile fetch error:', error);
+      throw error;
     }
   };
 
@@ -139,7 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       // Auto-login after successful registration
-      await login(username, password);
+      await login(username, password); // Fixed to match the login function signature
       
       toast({
         title: 'Registration successful',
@@ -163,6 +199,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('user');
     setToken(null);
     setUser(null);
+    setIsAuthenticated(false);
     
     toast({
       title: 'Logged out',
@@ -222,6 +259,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     token,
     loading,
     error,
+    isAuthenticated,
     login,
     register,
     logout,
@@ -238,3 +276,4 @@ export function useAuth() {
   }
   return context;
 }
+
