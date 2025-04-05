@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Post, fetchPosts } from '@/services/api';
+import { Post, fetchPosts, fetchUserPosts } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Loader, Edit2 } from 'lucide-react';
 import { DeletePostButton } from '@/components/posts/DeletePostButton';
@@ -31,8 +31,15 @@ const PostGrid = ({
     setError(null);
     
     try {
-      // Pass userId parameter to filter posts by user
-      const response = await fetchPosts(pageNum, 10, userId);
+      let response;
+      
+      if (userId) {
+        // Fetch posts only for the specific user
+        response = await fetchUserPosts(userId, pageNum, 10);
+      } else {
+        // Fetch all posts if no userId is specified
+        response = await fetchPosts(pageNum, 10);
+      }
       
       if (pageNum === 1) {
         setPosts(response.items || []);
@@ -149,6 +156,7 @@ const PostGrid = ({
                   onDelete={() => {
                     // Remove the post from the local state after deletion
                     setPosts(posts.filter(p => p.id !== post.id));
+                    // Show a success toast if you want
                   }} 
                 />
               </div>

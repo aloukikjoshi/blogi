@@ -11,6 +11,7 @@ import { Loader } from 'lucide-react';
 const Profile = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const isOwnProfile = true;
 
   useEffect(() => {
     if (!user) {
@@ -62,7 +63,15 @@ const Profile = () => {
           </TabsList>
           
           <TabsContent value="posts">
-            <PostGrid userId={user.id} showEditDelete={true} />
+            <div className="mb-6 flex justify-between items-center">
+              <h2 className="text-2xl font-bold">{isOwnProfile ? "My Posts" : `${user.name || user.username}'s Posts`}</h2>
+              {isOwnProfile && (
+                <Button onClick={() => navigate('/create')}>
+                  Create New Post
+                </Button>
+              )}
+            </div>
+            <PostGrid userId={user.id} showLoadMore={true} showEditDelete={isOwnProfile} />
           </TabsContent>
           
           <TabsContent value="drafts">

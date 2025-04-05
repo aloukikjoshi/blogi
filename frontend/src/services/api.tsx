@@ -194,3 +194,19 @@ export const deletePost = async (postId: string) => {
     return handleApiError(error);
   }
 };
+
+// Add this function to fetch posts for a specific user
+export const fetchUserPosts = async (userId: string, page: number = 1, limit: number = 10) => {
+  try {
+    const response = await fetch(`${API_URL}/users/${userId}/posts?page=${page}&limit=${limit}`);
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Failed to fetch user posts');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    return handleApiError(error);
+  }
+};

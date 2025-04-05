@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast'; // Import useToast
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -12,6 +13,7 @@ const Login = () => {
   const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
   const { login, loading } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast(); // Add this line to get toast function
 
   const validate = () => {
     const newErrors: { username?: string; password?: string } = {};
@@ -37,6 +39,14 @@ const Login = () => {
     
     try {
       await login(username, password);
+      
+      // Show the toast notification after successful login
+      toast({
+        title: "Logged in successfully.",
+        description: "Welcome back to your account!",
+      });
+      
+      // Navigate after showing toast
       navigate('/');
     } catch (error) {
       // Error is handled in AuthContext
