@@ -8,11 +8,13 @@ import { fetchPost } from '@/services/api';
 import { Loader } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { PostActions } from '@/components/posts/PostActions';
+import { Post as PostType, isApiError } from '@/types';
 
 const Post = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const [post, setPost] = useState<any | null>(null);
+  // Replace any with PostType | null
+  const [post, setPost] = useState<PostType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
@@ -31,9 +33,9 @@ const Post = () => {
         setLoading(true);
         const data = await fetchPost(slug);
         setPost(data);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to load post:', err);
-        setError(err.message || 'Failed to load post');
+        setError(err instanceof Error ? err.message : 'Failed to load post');
       } finally {
         setLoading(false);
       }
@@ -69,18 +71,6 @@ const Post = () => {
   return (
     <Layout>
       <article className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Featured image if it exists */}
-        {post.featured_image && (
-          <div className="mb-8">
-            <img
-              src={post.featured_image}
-              alt={post.title}
-              className="w-full h-auto rounded-lg object-cover"
-              style={{ maxHeight: '500px' }}
-            />
-          </div>
-        )}
-
         <header className="mb-8 relative">
           {/* Post title */}
           <div className="flex justify-between items-start">
@@ -134,9 +124,9 @@ const Post = () => {
 
         {/* Post content */}
         <div className="prose prose-lg max-w-none blog-content">
-          {post.content.split('\n').map((paragraph, index) => (
+          {post.content.split('\n').map((paragraph, index) =>
             paragraph ? <p key={index}>{paragraph}</p> : <br key={index} />
-          ))}
+          )}
         </div>
 
         {/* Show edit timestamp */}

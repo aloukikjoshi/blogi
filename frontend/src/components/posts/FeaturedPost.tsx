@@ -7,11 +7,11 @@ import { formatDistanceToNow } from 'date-fns';
 // Define a type for tag objects
 type TagObject = {
   name: string;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 // Type guard to check if a tag is an object with a name property
-function isTagObject(tag: any): tag is TagObject {
+function isTagObject(tag: unknown): tag is TagObject {
   return typeof tag === 'object' && tag !== null && 'name' in tag;
 }
 

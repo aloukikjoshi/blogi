@@ -8,13 +8,12 @@ class TagBase(BaseModel):
 
 class Tag(TagBase):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class PostBase(BaseModel):
     title: str
     content: str
     excerpt: Optional[str] = None
-    featured_image: Optional[str] = None
     tags: Optional[List[str]] = []
 
 class PostCreate(PostBase):
@@ -24,7 +23,6 @@ class PostUpdate(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
     excerpt: Optional[str] = None
-    featured_image: Optional[str] = None
     tags: Optional[List[str]] = None
 
 class PostInDB(PostBase):
@@ -35,14 +33,14 @@ class PostInDB(PostBase):
     updated_at: Optional[datetime] = None  # Add updated_at field
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class Post(PostInDB):
     author: User
     tags: List[Tag] = []
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class PostList(BaseModel):
     items: List[Post]

@@ -28,8 +28,12 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    "rootDir": "src",
+    "outDir": "dist",
+    // Disable declaration generation since you're using noEmit: true
+    "declaration": false
   },
-  "include": ["src"],
+  // "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }

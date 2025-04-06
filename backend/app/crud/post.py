@@ -87,7 +87,6 @@ def create_post(db: Session, post: PostCreate, user_id: str):
         title=post.title,
         content=post.content,
         excerpt=post.excerpt if post.excerpt else post.content[:150] + "...",
-        featured_image=post.featured_image,
         slug=slug,
         author_id=user_id,
         published_at=datetime.utcnow()

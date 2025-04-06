@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
-import { API_URL } from '@/services/api';
-import { jwtDecode } from 'jwt-decode';
+import { API_URL } from '@/config/api';
+
 
 // Define types
 type User = {
@@ -18,7 +18,7 @@ type LoginCredentials = {
   password: string;
 };
 
-type AuthContextType = {
+interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
@@ -28,7 +28,7 @@ type AuthContextType = {
   register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   updateUserProfile: (userData: Partial<User>) => Promise<void>;
-};
+}
 
 // Create context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -117,9 +117,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       setIsAuthenticated(true);
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error);
-      setError(error.message);
+      setError(error instanceof Error ? error.message : String(error));
       throw error;
     } finally {
       setLoading(false);
@@ -181,11 +181,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         title: 'Registration successful',
         description: 'Your account has been created!',
       });
-    } catch (err: any) {
-      setError(err.message || 'Failed to register');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to register');
       toast({
         title: 'Registration failed',
-        description: err.message || 'Please try with different credentials',
+        description: err instanceof Error ? err.message : 'Please try with different credentials',
         variant: 'destructive',
       });
     } finally {
@@ -242,11 +242,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         title: 'Profile updated',
         description: 'Your profile has been successfully updated',
       });
-    } catch (err: any) {
-      setError(err.message || 'Failed to update profile');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'There was an error updating your profile';
+      setError(errorMessage || 'Failed to update profile');
       toast({
         title: 'Update failed',
-        description: err.message || 'There was an error updating your profile',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

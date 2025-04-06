@@ -25,7 +25,6 @@ class Post(Base):
     title = Column(String, index=True)
     content = Column(Text)
     excerpt = Column(String, nullable=True)
-    featured_image = Column(String, nullable=True)
     slug = Column(String, unique=True, index=True)
     published_at = Column(DateTime(timezone=True), server_default=func.now())
     created_at = Column(DateTime(timezone=True), server_default=func.now())

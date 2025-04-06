@@ -32,11 +32,6 @@ const Footer = () => {
                   Explore
                 </Link>
               </li>
-              <li>
-                <Link to="/search" className="text-gray-600 hover:text-blogi-600 transition-colors">
-                  Search
-                </Link>
-              </li>
             </ul>
           </div>
           

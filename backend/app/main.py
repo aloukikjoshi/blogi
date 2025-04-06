@@ -6,9 +6,6 @@ import os
 from app.api.endpoints import auth, users, posts
 from app.core.config import settings
 
-# Create upload directory if it doesn't exist
-os.makedirs(os.path.join("static", "uploads"), exist_ok=True)
-
 app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
@@ -22,9 +19,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Mount static files directory
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Include API routes
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["authentication"])

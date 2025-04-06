@@ -55,10 +55,11 @@ const CreatePost = () => {
       });
       
       navigate('/');
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
       toast({
         title: "Failed to create post",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {

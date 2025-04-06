@@ -6,15 +6,15 @@ import { DeletePostButton } from '@/components/posts/DeletePostButton';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link } from 'react-router-dom';
-import { PostActions } from './PostActions';
+import { PostActions } from '@/components/posts/PostActions';
 import { useAuth } from '@/contexts/AuthContext';
 
-type PostGridProps = {
+interface PostGridProps {
   initialPosts?: Post[];
+  showLoadMore: boolean;
   userId?: string;
-  showLoadMore?: boolean;
   showEditDelete?: boolean;
-};
+}
 
 const PostGrid = ({
   initialPosts,
@@ -51,9 +51,9 @@ const PostGrid = ({
       }
       
       setHasMore((response.total || 0) > (pageNum * 10));
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load posts:', err);
-      setError(err.message || 'Failed to load posts');
+      setError((err as Error).message || 'Failed to load posts');
     } finally {
       setLoading(false);
     }

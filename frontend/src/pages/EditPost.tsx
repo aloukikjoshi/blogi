@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { fetchPost, updatePost } from '@/services/api';
 import { Loader } from 'lucide-react';
+import { toast } from "@/hooks/use-toast";
 
 const EditPost = () => {
   const { id } = useParams();
@@ -35,18 +36,18 @@ const EditPost = () => {
         // Handle tags - could be array of objects or array of strings
         if (post.tags && post.tags.length > 0) {
           if (typeof post.tags[0] === 'object') {
-            setTags(post.tags.map((tag: any) => tag.name).join(', '));
+            setTags(post.tags.map((tag: { name: string }) => tag.name).join(', '));
           } else {
             setTags(post.tags.join(', '));
           }
         }
-      } catch (error: any) {
-        toast({
-          title: "Error loading post",
-          description: error.message,
-          variant: "destructive"
-        });
-        navigate('/');
+      } catch (error: unknown) {
+          toast({
+            title: "Error loading post",
+            description: error instanceof Error ? error.message : 'An unexpected error occurred',
+            variant: "destructive"
+          });
+          navigate('/');
       } finally {
         setLoadingPost(false);
       }
@@ -90,12 +91,12 @@ const EditPost = () => {
       });
       
       navigate(`/post/${id}`);
-    } catch (error: any) {
-      toast({
-        title: "Failed to update post",
-        description: error.message,
-        variant: "destructive"
-      });
+    } catch (error: unknown) {
+    toast({
+      title: "Failed to update post",
+      description: error instanceof Error ? error.message : String(error),
+      variant: "destructive"
+    });
     } finally {
       setLoading(false);
     }

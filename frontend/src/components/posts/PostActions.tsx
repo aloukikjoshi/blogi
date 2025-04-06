@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavigateFunction } from 'react-router-dom';
 import { MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -19,13 +19,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { API_URL } from '@/config/api';
 
 interface PostActionsProps {
   postId: string;
   onDelete?: () => void;
 }
-
-const API_URL = "http://localhost:8000/api/v1"; // or import it from your config
 
 export const PostActions = ({ postId, onDelete }: PostActionsProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -57,12 +56,13 @@ export const PostActions = ({ postId, onDelete }: PostActionsProps) => {
       
       if (onDelete) onDelete();
       else navigate('/');
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to delete post",
-        variant: "destructive",
-      });
+    } catch (error: unknown) {
+    const errorMessage = (error as Error).message || "Failed to delete post";
+    toast({
+      title: "Error",
+      description: errorMessage,
+      variant: "destructive",
+    });
     } finally {
       setDeleteLoading(false);
       setShowDeleteDialog(false);

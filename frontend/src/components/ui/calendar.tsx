@@ -9,7 +9,7 @@ export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 function Calendar({
   className,
-  classNames,
+  classNames = {},
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
@@ -51,10 +51,12 @@ function Calendar({
         day_hidden: "invisible",
         ...classNames,
       }}
-      components={{
-        IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
-      }}
+      components={
+        {
+          IconPrevious: () => <ChevronLeft className="h-4 w-4" />,
+          IconNext: () => <ChevronRight className="h-4 w-4" />,
+        } as unknown as CalendarProps["components"]
+      }
       {...props}
     />
   );

@@ -1,8 +1,6 @@
 import { toast } from '@/components/ui/use-toast';
 import axios from 'axios';
-
-// API URL
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+import { API_URL } from '@/config/api';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -24,7 +22,6 @@ export interface Post {
   author: {
     id: string;
     username: string;
-    name?: string;
     avatar?: string;
   };
   tags?: Array<{ name: string }>;
@@ -35,7 +32,6 @@ export type CreatePostData = {
   title: string;
   content: string;
   excerpt?: string;
-  featured_image?: string;
   tags?: string[];
 };
 
@@ -45,9 +41,9 @@ export type UpdatePostData = Partial<CreatePostData>;
 const getToken = () => localStorage.getItem('token');
 
 // Helper for API errors
-const handleApiError = (error: any) => {
+const handleApiError = (error: unknown) => {
   console.error('API Error:', error);
-  const message = error.message || 'An unexpected error occurred';
+  const message = error instanceof Error ? error.message : 'An unexpected error occurred';
   toast({
     title: 'Error',
     description: message,

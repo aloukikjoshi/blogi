@@ -27,9 +27,9 @@ const Index = () => {
           // Only take next 6 posts
           setPosts(response.items.slice(1, 7));
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to load posts:', err);
-        setError(err.message || 'Failed to load posts');
+        setError((err as Error).message || 'Failed to load posts');
       } finally {
         setLoading(false);
       }

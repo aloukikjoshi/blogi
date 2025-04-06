@@ -35,10 +35,11 @@ export const DeletePostButton = ({ postId, onDelete }: DeletePostButtonProps) =>
       });
       
       if (onDelete) onDelete();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = (error as Error).message || "Failed to delete post";
       toast({
         title: "Error",
-        description: error.message || "Failed to delete post",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

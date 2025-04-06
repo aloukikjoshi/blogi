@@ -19,17 +19,19 @@ const UserProfile = () => {
   useEffect(() => {
     const loadProfile = async () => {
       if (!userId) return;
-      
+
       try {
         const userData = await fetchUserProfile(userId);
         console.log('User data:', userData);
         setUser(userData);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load user profile');
+      } catch (err: unknown) {
+        const errorMessage =
+          err instanceof Error ? err.message || 'Failed to load user profile' : 'Failed to load user profile';
+        setError(errorMessage);
         toast({
           title: "Error",
-          description: err.message || 'Failed to load user profile',
-          variant: "destructive"
+          description: errorMessage,
+          variant: "destructive",
         });
       } finally {
         setLoading(false);
@@ -59,17 +61,12 @@ const UserProfile = () => {
       </Layout>
     );
   }
-  
-  // Calculate a stable registration date from user ID if created_at is missing
-  // This is a better temporary solution than random dates
+
+  // Calculate a stable registration date from user.created_at or derive from user.id
   const getRegistrationDateFromId = (id: string): string => {
     try {
-      // UUIDs v1 and v2 contain a timestamp
-      // Extract the hex timestamp from the first 8 chars of a UUID
       const firstPart = id.split('-')[0];
-      // Convert hex to decimal and multiply by 1000 to get milliseconds
       const timestamp = parseInt(firstPart, 16) * 1000;
-      // If the timestamp is reasonable (after 2000), use it
       const date = new Date(timestamp);
       if (date.getFullYear() > 2000 && date.getFullYear() < 2100) {
         return date.toISOString();
@@ -77,22 +74,20 @@ const UserProfile = () => {
     } catch (e) {
       console.error('Failed to parse date from ID', e);
     }
-    
-    // Fallback to a default date that makes sense for your app
-    return '2023-01-01T00:00:00.000Z'; // Generic "joined in 2023"
+    return '2023-01-01T00:00:00.000Z';
   };
-  
+
   const registrationDate = user.created_at || getRegistrationDateFromId(user.id);
-  
+  const fallbackInitial =
+    user.username && user.username.length > 0 ? user.username.charAt(0).toUpperCase() : "";
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col items-center mb-12">
           <Avatar className="h-32 w-32 mb-4">
             <AvatarImage src={user.avatar || undefined} alt={user.username} />
-            <AvatarFallback>
-              {(user.username?.[0]).toUpperCase()}
-            </AvatarFallback>
+            <AvatarFallback>{fallbackInitial}</AvatarFallback>
           </Avatar>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             {user.username}
@@ -104,7 +99,7 @@ const UserProfile = () => {
 
         <div>
           <h2 className="text-2xl font-bold mb-6">Posts by {user.username}</h2>
-          <PostGrid userId={userId} showEditDelete={false} />
+          <PostGrid userId={user.id} showLoadMore={false} />
         </div>
       </div>
     </Layout>
