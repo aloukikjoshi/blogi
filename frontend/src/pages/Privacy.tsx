@@ -21,7 +21,7 @@ const Privacy = () => {
               We collect information that you provide directly to us, such as when you create an account or post content. This may include:
             </p>
             <ul className="list-disc pl-6 mb-4">
-              <li>Name and username</li>
+              <li>Username</li>
               <li>Email address</li>
               <li>Profile information</li>
               <li>Content you post</li>

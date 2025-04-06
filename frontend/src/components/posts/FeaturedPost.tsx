@@ -4,10 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Post } from '@/services/api';
 import { formatDistanceToNow } from 'date-fns';
 
-type FeaturedPostProps = {
-  post: Post;
-};
-
 // Define a type for tag objects
 type TagObject = {
   name: string;
@@ -19,13 +15,12 @@ function isTagObject(tag: any): tag is TagObject {
   return typeof tag === 'object' && tag !== null && 'name' in tag;
 }
 
-const FeaturedPost = ({ post }: FeaturedPostProps) => {
+const FeaturedPost = ({ post }) => {
   const {
     title,
     excerpt,
     slug,
     published_at,
-    featured_image,
     author,
     tags = [],
   } = post;
@@ -34,29 +29,14 @@ const FeaturedPost = ({ post }: FeaturedPostProps) => {
   const formattedDate = formatDistanceToNow(new Date(published_at), { addSuffix: true });
   
   // Get author initials for fallback
-  const getInitials = (name?: string, username?: string) => {
-    if (name && name.length > 0) {
-      return name.split(' ').map(n => n[0]).join('').toUpperCase();
-    }
+  const getInitials = (username?: string) => {
     return username ? username[0].toUpperCase() : 'U';
   };
 
   return (
     <article className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 transition-all hover:shadow-md">
       <div className="md:flex">
-        {featured_image && (
-          <div className="md:w-1/2 h-64 md:h-auto">
-            <Link to={`/post/${slug}`} className="block overflow-hidden h-full relative">
-              <img
-                src={featured_image}
-                alt={title}
-                className="w-full h-full object-cover transition-transform hover:scale-105"
-              />
-            </Link>
-          </div>
-        )}
-        
-        <div className="p-6 md:w-1/2 flex flex-col">
+        <div className="p-6 w-full flex flex-col">
           <div className="flex-grow">
             {tags && tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-3">
@@ -90,11 +70,11 @@ const FeaturedPost = ({ post }: FeaturedPostProps) => {
             <div className="flex items-center mb-4">
               <Link to={`/profile/${author.id}`} className="flex items-center">
                 <Avatar className="h-10 w-10 mr-3">
-                  <AvatarImage src={author.avatar} alt={author.name || author.username} />
-                  <AvatarFallback>{getInitials(author.name, author.username)}</AvatarFallback>
+                  <AvatarImage src={author.avatar} alt={author.username} />
+                  <AvatarFallback>{getInitials(author.username)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <span className="font-medium text-gray-900">{author.name || author.username}</span>
+                  <span className="font-medium text-gray-900">{author.username}</span>
                   <p className="text-sm text-gray-500">{formattedDate}</p>
                 </div>
               </Link>

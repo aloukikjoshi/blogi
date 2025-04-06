@@ -104,12 +104,12 @@ const Post = () => {
             <Avatar className="h-10 w-10 mr-3">
               <AvatarImage src={post.author.avatar} />
               <AvatarFallback>
-                {post.author.name?.[0] || post.author.username[0]}
+                {post.author.username[0]}
               </AvatarFallback>
             </Avatar>
             <div>
               <p className="font-medium text-gray-900">
-                {post.author.name || post.author.username}
+                {post.author.username}
               </p>
               <p className="text-sm text-gray-500">
                 {format(new Date(post.published_at), 'MMMM d, yyyy')}

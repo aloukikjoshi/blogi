@@ -89,24 +89,21 @@ const UserProfile = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col items-center mb-12">
           <Avatar className="h-32 w-32 mb-4">
-            <AvatarImage src={user.avatar || undefined} alt={user.name || user.username} />
+            <AvatarImage src={user.avatar || undefined} alt={user.username} />
             <AvatarFallback>
-              {(user.name?.[0] || user.username?.[0] || 'U').toUpperCase()}
+              {(user.username?.[0]).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {user.name || user.username}
+            {user.username}
           </h1>
-          {user.bio && (
-            <p className="text-gray-600 text-center max-w-2xl mb-4">{user.bio}</p>
-          )}
           <div className="text-sm text-gray-500">
             Member since {formatDate(registrationDate)}
           </div>
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold mb-6">Posts by {user.name || user.username}</h2>
+          <h2 className="text-2xl font-bold mb-6">Posts by {user.username}</h2>
           <PostGrid userId={userId} showEditDelete={false} />
         </div>
       </div>

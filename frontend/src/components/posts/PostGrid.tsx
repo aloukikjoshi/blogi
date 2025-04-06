@@ -130,7 +130,7 @@ const PostGrid = ({
               <Avatar className="h-8 w-8 mr-3">
                 <AvatarImage src={post.author.avatar} />
                 <AvatarFallback>
-                  {post.author.name?.[0] || post.author.username[0]}
+                  {post.author.username[0]}
                 </AvatarFallback>
               </Avatar>
               <div>
@@ -138,7 +138,7 @@ const PostGrid = ({
                   to={`/profile/${post.author.id}`}
                   className="text-sm font-medium hover:text-blogi-600"
                 >
-                  {post.author.name || post.author.username}
+                  {post.author.username}
                 </Link>
               </div>
             </div>
