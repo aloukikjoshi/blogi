@@ -11,14 +11,21 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Menu, X, User, Settings, LogOut, PenTool } from 'lucide-react';
+import { Menu, X, User, Settings, LogOut, Search, PenTool } from 'lucide-react';
 
 const Header = () => {
   const { user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Redirect to search page with query
+    window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
   };
 
   const getInitials = (name?: string, username?: string) => {
@@ -132,18 +139,11 @@ const Header = () => {
                   Write a Post
                 </Link>
                 <Link
-                  to="/profile"
+                  to={`/profile/${userId}`}
                   className="block py-2 text-center text-gray-700 hover:text-blogi-600"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Profile
-                </Link>
-                <Link
-                  to="/settings"
-                  className="block py-2 text-center text-gray-700 hover:text-blogi-600"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Settings
                 </Link>
                 <button
                   onClick={() => {

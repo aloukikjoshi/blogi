@@ -17,7 +17,6 @@ import Logout from './pages/Logout';
 import Explore from '@/pages/Explore';
 import Post from './pages/Post';
 import EditPost from './pages/EditPost';
-import Profile from './pages/Profile';
 import UserProfile from './pages/UserProfile';
 
 const queryClient = new QueryClient();
@@ -49,7 +48,6 @@ const App = () => (
                 <EditPost />
               </RequireAuth>
             } />
-            <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:userId" element={<UserProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

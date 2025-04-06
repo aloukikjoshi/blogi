@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -44,8 +43,8 @@ const Register = () => {
     
     if (!password) {
       newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else if (password.length < 8) { // Changed from 6 to 8 characters
+      newErrors.password = 'Password must be at least 8 characters';
     }
     
     if (password !== confirmPassword) {
@@ -145,6 +144,9 @@ const Register = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className={errors.password ? 'border-red-500' : ''}
                 />
+                <p className="mt-1 text-sm text-gray-500">
+                  Password must be at least 8 characters long
+                </p>
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-600">{errors.password}</p>
                 )}
