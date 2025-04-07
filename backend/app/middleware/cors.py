@@ -20,10 +20,25 @@ class VercelCORSMiddleware(BaseHTTPMiddleware):
             }
             return JSONResponse(content={}, status_code=200, headers=headers)
 
-        response = await call_next(request)
-
-        if origin in allowed_origins:
-            response.headers["Access-Control-Allow-Origin"] = origin
-            response.headers["Access-Control-Allow-Credentials"] = "true"
-
-        return response
+        try:
+            response = await call_next(request)
+            
+            if origin in allowed_origins:
+                response.headers["Access-Control-Allow-Origin"] = origin
+                response.headers["Access-Control-Allow-Credentials"] = "true"
+                
+            return response
+            
+        except Exception as e:
+            # Create a response for the error case
+            error_response = JSONResponse(
+                status_code=500,
+                content={"detail": "Internal Server Error"}
+            )
+            
+            # Apply CORS headers even to error responses
+            if origin in allowed_origins:
+                error_response.headers["Access-Control-Allow-Origin"] = origin
+                error_response.headers["Access-Control-Allow-Credentials"] = "true"
+                
+            return error_response
