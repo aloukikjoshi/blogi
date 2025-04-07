@@ -1,8 +1,22 @@
 {
-    "routes": [
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
         {
-            "src": "/(.*)",
-            "dest": "/index.html"
+          "key": "Content-Type",
+          "value": "application/javascript"
         }
-    ]
+      ]
+    }
+  ]
 }
