@@ -1,26 +1,20 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
 
 from app.api.endpoints import auth, users, posts
 from app.core.config import settings
+from app.middleware.cors import VercelCORSMiddleware
 
 app = FastAPI(
-    title=settings.PROJECT_NAME,
+    title="Blogi API",
+    description="API for Blogi platform",
+    version="0.1.0",
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
-# Set up CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods including OPTIONS
-    allow_headers=["*"],  # Allow all headers
-    expose_headers=["Content-Disposition"],
-    max_age=600
-)
+# Add our custom Vercel-compatible CORS middleware
+app.add_middleware(VercelCORSMiddleware)
 
 # Include API routes
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["authentication"])
