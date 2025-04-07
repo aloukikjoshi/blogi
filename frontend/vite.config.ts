@@ -10,22 +10,29 @@ export default defineConfig({
       localsConvention: 'camelCase',
     },
     postcss: './postcss.config.js',
+    devSourcemap: true,
   },
   server: {
     port: 8080,
   },
   build: {
-    cssCodeSplit: false,
+    sourcemap: true,
     rollupOptions: {
-      input: './index.html',
       output: {
-        manualChunks: undefined,
-      }
+        assetFileNames: 'assets/[name]-[hash][extname]',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+      },
     },
+    cssCodeSplit: true,
+    assetsInlineLimit: 4096,
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
   },
 });
