@@ -3,6 +3,7 @@ from typing import List
 from pydantic_settings import BaseSettings
 from pydantic import PostgresDsn, field_validator
 from dotenv import load_dotenv
+import json
 
 # Get environment mode
 ENV = os.getenv("ENV", "development")
@@ -45,7 +46,6 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             if v.startswith("["):
                 # JSON-formatted list
-                import json
                 try:
                     return json.loads(v)
                 except json.JSONDecodeError:
@@ -57,9 +57,9 @@ class Settings(BaseSettings):
             return v
         return []
 
-    model_config = {
-        "case_sensitive": True
-    }
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
 
 settings = Settings()
 
