@@ -4,6 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  base: process.env.VITE_API_URL || '/blogi/frontend/',
   css: {
     modules: {
       localsConvention: 'camelCase',
