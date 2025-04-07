@@ -13,6 +13,11 @@ export default defineConfig(({ command }) => {
             server: {
                 port: 8080
             }
-        })
+        }),
+        build: {
+            rollupOptions: {
+                external: ['axios'], // Add axios here
+            },
+        },
     };
 });
