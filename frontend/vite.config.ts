@@ -9,7 +9,7 @@ export default defineConfig({
     modules: {
       localsConvention: 'camelCase',
     },
-    postcss: './postcss.config.js',
+    postcss: './postcss.config.cjs', // Changed extension
     devSourcemap: true,
   },
   server: {
@@ -19,12 +19,19 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
-        assetFileNames: 'assets/[name]-[hash][extname]',
+        // Force a predictable CSS filename
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+            return 'assets/style-[hash].css';
+          }
+          return 'assets/[name]-[hash][extname]';
+        },
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
       },
     },
-    cssCodeSplit: true,
+    // Turn OFF CSS code splitting
+    cssCodeSplit: false,
     assetsInlineLimit: 4096,
   },
   resolve: {

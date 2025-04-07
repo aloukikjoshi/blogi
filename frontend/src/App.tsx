@@ -18,48 +18,51 @@ import Explore from "./pages/Explore";
 import Post from "./pages/Post";
 import EditPost from "./pages/EditPost";
 import UserProfile from "./pages/UserProfile";
+import { ThemeProvider } from "next-themes"; // Add this import
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/cookies" element={<Cookies />} />
-            <Route
-              path="/create-post"
-              element={
-                <RequireAuth>
-                  <CreatePost />
-                </RequireAuth>
-              }
-            />
-            <Route path="/logout" element={<Logout />} />
-            <Route path="/explore" element={<Explore />} />
-            <Route path="/post/:slug" element={<Post />} />
-            <Route
-              path="/edit/:id"
-              element={
-                <RequireAuth>
-                  <EditPost />
-                </RequireAuth>
-              }
-            />
-            <Route path="/profile/:userId" element={<UserProfile />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
+    <ThemeProvider defaultTheme="light" attribute="class"> {/* Add this wrapper */}
+      <TooltipProvider>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/cookies" element={<Cookies />} />
+              <Route
+                path="/create-post"
+                element={
+                  <RequireAuth>
+                    <CreatePost />
+                  </RequireAuth>
+                }
+              />
+              <Route path="/logout" element={<Logout />} />
+              <Route path="/explore" element={<Explore />} />
+              <Route path="/post/:slug" element={<Post />} />
+              <Route
+                path="/edit/:id"
+                element={
+                  <RequireAuth>
+                    <EditPost />
+                  </RequireAuth>
+                }
+              />
+              <Route path="/profile/:userId" element={<UserProfile />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
