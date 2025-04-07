@@ -25,15 +25,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "baseUrl": ".",
+    "baseUrl": ".", // Base directory for resolving non-relative module names
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"] // Alias for "@/..." to map to "src/..."
     },
-    "rootDir": "src",
-    "outDir": "dist",
-    // Disable declaration generation since you're using noEmit: true
-    "declaration": false
+    "rootDir": "./src", // Root directory of input files
+    "outDir": "./dist", // Output directory for compiled files
+    "declaration": false // Disable declaration generation since noEmit is true
   },
-  // "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src"], // Include the "src" directory for compilation
+  "exclude": ["node_modules", "dist"] // Exclude unnecessary directories
 }

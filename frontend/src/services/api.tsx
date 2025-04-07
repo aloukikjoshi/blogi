@@ -1,6 +1,6 @@
-import { toast } from '@/components/ui/use-toast';
 import axios from 'axios';
-import { API_URL } from '@/config/api';
+import { toast } from 'react-hot-toast';
+import { API_URL } from '../config/api'
 
 const api = axios.create({
   baseURL: API_URL,
@@ -44,11 +44,7 @@ const getToken = () => localStorage.getItem('token');
 const handleApiError = (error: unknown) => {
   console.error('API Error:', error);
   const message = error instanceof Error ? error.message : 'An unexpected error occurred';
-  toast({
-    title: 'Error',
-    description: message,
-    variant: 'destructive',
-  });
+  toast.error(message);
   throw error;
 };
 

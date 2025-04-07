@@ -1,23 +1,25 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc"; // or switch to @vitejs/plugin-react if preferred
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react-swc';
+import path from 'path';
 
-export default defineConfig(({ command }) => {
-    return {
-        plugins: [react()],
-        resolve: {
-            alias: {
-                "@": "/src",
-            },
-        },
-        ...(command === "serve" && {
-            server: {
-                port: 8080
-            }
-        }),
-        build: {
-            rollupOptions: {
-                external: ['axios'], // Add axios here
-            },
-        },
-    };
+export default defineConfig({
+  plugins: [react()],
+  css: {
+    modules: {
+      localsConvention: 'camelCase',
+    },
+  },
+  server: {
+    port: 8080,
+  },
+  build: {
+    rollupOptions: {
+      input: './index.html', // Fix this line - @/ alias doesn't work here
+    },
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
 });
