@@ -17,19 +17,22 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(User).offset(skip).limit(limit).all()
 
 def create_user(db: Session, user: UserCreate):
-    hashed_password = get_password_hash(user.password)
-    db_user = User(
-        email=user.email,
-        username=user.username,
-        hashed_password=hashed_password,
-        name=user.name,
-        bio=user.bio,
-        avatar=user.avatar
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    try:
+        hashed_password = get_password_hash(user.password)
+        db_user = User(
+            email=user.email,
+            username=user.username,
+            avatar=user.avatar,  # Make sure this field exists in your model
+            hashed_password=hashed_password
+        )
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    except Exception as e:
+        print(f"Error creating user: {str(e)}")
+        db.rollback()
+        raise e
 
 def update_user(db: Session, user_id: str, user: UserUpdate):
     db_user = get_user(db, user_id)
