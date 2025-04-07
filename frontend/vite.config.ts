@@ -15,7 +15,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      input: './index.html', // Fix this line - @/ alias doesn't work here
+      input: './index.html',
     },
   },
   resolve: {

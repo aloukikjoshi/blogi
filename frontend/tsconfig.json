@@ -33,6 +33,5 @@
     "outDir": "./dist", // Output directory for compiled files
     "declaration": false // Disable declaration generation since noEmit is true
   },
-  "include": ["src"], // Include the "src" directory for compilation
   "exclude": ["node_modules", "dist"] // Exclude unnecessary directories
 }
