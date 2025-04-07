@@ -8,7 +8,14 @@
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "/src/index.js"
+            "dest": "main.py",
+            "methods": ["GET", "POST"]
+        }
+    ],
+    "functions": [
+        {
+            "src": "api/*.py",
+            "use": "@vercel/python"
         }
     ]
 }
