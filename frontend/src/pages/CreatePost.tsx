@@ -72,21 +72,23 @@ const CreatePost = () => {
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">Create New Post</h1>
         
-        <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto">
-          <div>
-            <Label htmlFor="title">Title</Label>
+        <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl mx-auto bg-slate-50 p-6 rounded-lg shadow-sm">
+          <div className="space-y-2">
+            <Label htmlFor="title" className="text-sm font-medium">Title</Label>
             <Input
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter post title"
+              className="w-full h-10"
               required
             />
           </div>
           
-          <div>
-            <Label htmlFor="excerpt">Excerpt (Optional)</Label>
+          <div className="space-y-2">
+            <Label htmlFor="excerpt" className="text-sm font-medium">Excerpt (Optional)</Label>
             <Textarea
+              className="w-full min-h-[80px] bg-white resize-none border border-input px-3 py-2 placeholder:text-gray-500"
               id="excerpt"
               value={excerpt}
               onChange={(e) => setExcerpt(e.target.value)}
@@ -94,50 +96,55 @@ const CreatePost = () => {
             />
           </div>
           
-          <div>
-            <Label htmlFor="tags">Tags (Optional)</Label>
+          <div className="space-y-2">
+            <Label htmlFor="tags" className="text-sm font-medium">Tags (Optional)</Label>
             <Input
               id="tags"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="Enter tags separated by commas"
+              className="w-full h-10"
             />
           </div>
           
-          <div>
-            <Label>Content</Label>
-            <Tabs defaultValue="write">
-              <TabsList>
-                <TabsTrigger value="write">Write</TabsTrigger>
-                <TabsTrigger value="preview">Preview</TabsTrigger>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Content</Label>
+            <Tabs defaultValue="write" className="w-full">
+              <TabsList className="mb-2">
+          <TabsTrigger value="write">Write</TabsTrigger>
+          <TabsTrigger value="preview">Preview</TabsTrigger>
               </TabsList>
-              <TabsContent value="write">
-                <Textarea
-                  id="content"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  className="editor-textarea"
-                  placeholder="Write your post content here..."
-                  required
-                />
+              <TabsContent value="write" className="mt-0">
+          <Textarea
+            className="w-full min-h-[250px] bg-white editor-textarea border border-input px-3 py-2 placeholder:text-gray-500"
+            id="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Write your post content here..."
+            required
+          />
               </TabsContent>
-              <TabsContent value="preview">
-                <div className="editor-preview">
-                  {content ? (
-                    <div dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br />') }} />
-                  ) : (
-                    <p className="text-gray-400">Your content preview will appear here</p>
-                  )}
-                </div>
+              <TabsContent value="preview" className="mt-0">
+          <div className="editor-preview border rounded-md p-4 min-h-[250px] bg-white">
+            {content ? (
+              <div dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br />') }} />
+            ) : (
+              <p className="text-gray-400">Your content preview will appear here</p>
+            )}
+          </div>
               </TabsContent>
             </Tabs>
           </div>
           
-          <Button type="submit" disabled={loading} className="w-full sm:w-auto">
+          <Button 
+            type="submit" 
+            disabled={loading} 
+            className="w-full sm:w-auto px-6 py-2 mt-4"
+          >
             {loading ? (
               <>
-                <Loader className="mr-2 h-4 w-4 animate-spin" />
-                Publishing...
+          <Loader className="mr-2 h-4 w-4 animate-spin" />
+          Publishing...
               </>
             ) : (
               'Publish Post'

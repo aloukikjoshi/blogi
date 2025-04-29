@@ -9,7 +9,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { fetchPost, updatePost } from '@/services/api';
 import { Loader } from 'lucide-react';
-import { toast } from "@/hooks/use-toast";
 
 const EditPost = () => {
   const { id } = useParams();
@@ -22,6 +21,7 @@ const EditPost = () => {
   const [tags, setTags] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [loadingPost, setLoadingPost] = useState(true);
+  const [publishedAt, setPublishedAt] = useState<string | null>(null); // Track original publish date
 
   useEffect(() => {
     const loadPost = async () => {
@@ -32,6 +32,11 @@ const EditPost = () => {
         setTitle(post.title);
         setContent(post.content);
         setExcerpt(post.excerpt || '');
+        
+        // Store the original published date to preserve it
+        if (post.published_at) {
+          setPublishedAt(post.published_at);
+        }
         
         // Handle tags - could be array of objects or array of strings
         if (post.tags && post.tags.length > 0) {
@@ -80,7 +85,9 @@ const EditPost = () => {
         title,
         content,
         excerpt: excerpt || undefined,
-        tags: tagsArray.length > 0 ? tagsArray : undefined
+        tags: tagsArray.length > 0 ? tagsArray : undefined,
+        published_at: publishedAt, // Preserve the original publish date
+        updated_at: new Date().toISOString() // Add current timestamp as update time
       };
       
       await updatePost(id!, postData);
@@ -92,11 +99,11 @@ const EditPost = () => {
       
       navigate(`/post/${id}`);
     } catch (error: unknown) {
-    toast({
-      title: "Failed to update post",
-      description: error instanceof Error ? error.message : String(error),
-      variant: "destructive"
-    });
+      toast({
+        title: "Failed to update post",
+        description: error instanceof Error ? error.message : String(error),
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
@@ -117,21 +124,23 @@ const EditPost = () => {
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">Edit Post</h1>
         
-        <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto">
-          <div>
-            <Label htmlFor="title">Title</Label>
+        <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl mx-auto bg-slate-50 p-6 rounded-lg shadow-sm">
+          <div className="space-y-2">
+            <Label htmlFor="title" className="text-sm font-medium">Title</Label>
             <Input
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter post title"
+              className="w-full h-10"
               required
             />
           </div>
           
-          <div>
-            <Label htmlFor="excerpt">Excerpt (Optional)</Label>
+          <div className="space-y-2">
+            <Label htmlFor="excerpt" className="text-sm font-medium">Excerpt (Optional)</Label>
             <Textarea
+              className="w-full min-h-[80px] bg-white resize-none border border-input px-3 py-2 placeholder:text-gray-500"
               id="excerpt"
               value={excerpt}
               onChange={(e) => setExcerpt(e.target.value)}
@@ -139,35 +148,36 @@ const EditPost = () => {
             />
           </div>
           
-          <div>
-            <Label htmlFor="tags">Tags (Optional)</Label>
+          <div className="space-y-2">
+            <Label htmlFor="tags" className="text-sm font-medium">Tags (Optional)</Label>
             <Input
               id="tags"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="Enter tags separated by commas"
+              className="w-full h-10"
             />
           </div>
           
-          <div>
-            <Label>Content</Label>
-            <Tabs defaultValue="write">
-              <TabsList>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Content</Label>
+            <Tabs defaultValue="write" className="w-full">
+              <TabsList className="mb-2">
                 <TabsTrigger value="write">Write</TabsTrigger>
                 <TabsTrigger value="preview">Preview</TabsTrigger>
               </TabsList>
-              <TabsContent value="write">
+              <TabsContent value="write" className="mt-0">
                 <Textarea
+                  className="w-full min-h-[250px] bg-white editor-textarea border border-input px-3 py-2 placeholder:text-gray-500"
                   id="content"
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  className="editor-textarea"
                   placeholder="Write your post content here..."
                   required
                 />
               </TabsContent>
-              <TabsContent value="preview">
-                <div className="editor-preview">
+              <TabsContent value="preview" className="mt-0">
+                <div className="editor-preview border rounded-md p-4 min-h-[250px] bg-white">
                   {content ? (
                     <div dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br />') }} />
                   ) : (
@@ -178,7 +188,18 @@ const EditPost = () => {
             </Tabs>
           </div>
           
-          <Button type="submit" disabled={loading} className="w-full sm:w-auto">
+          {publishedAt && (
+            <div className="text-sm text-gray-500">
+              <span>Originally published: {new Date(publishedAt).toLocaleDateString()}</span>
+              <span className="ml-2">• Editing will update the modification timestamp</span>
+            </div>
+          )}
+          
+          <Button 
+            type="submit" 
+            disabled={loading} 
+            className="w-full sm:w-auto px-6 py-2 mt-4"
+          >
             {loading ? (
               <>
                 <Loader className="mr-2 h-4 w-4 animate-spin" />
