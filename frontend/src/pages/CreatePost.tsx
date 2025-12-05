@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { createPost } from '@/services/api';
 import { Loader } from 'lucide-react';
 
@@ -14,6 +13,7 @@ const CreatePost = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [excerpt, setExcerpt] = useState('');
+  const [coverImage, setCoverImage] = useState('');
   const [tags, setTags] = useState<string>('');
   const [loading, setLoading] = useState(false);
   
@@ -44,6 +44,7 @@ const CreatePost = () => {
         title,
         content,
         excerpt: excerpt || undefined,
+        cover_image: coverImage || undefined,
         tags: tagsArray.length > 0 ? tagsArray : undefined
       };
       
@@ -97,6 +98,17 @@ const CreatePost = () => {
           </div>
           
           <div className="space-y-2">
+            <Label htmlFor="coverImage" className="text-sm font-medium">Cover Image URL (Optional)</Label>
+            <Input
+              id="coverImage"
+              value={coverImage}
+              onChange={(e) => setCoverImage(e.target.value)}
+              placeholder="Enter image URL"
+              className="w-full h-10"
+            />
+          </div>
+          
+          <div className="space-y-2">
             <Label htmlFor="tags" className="text-sm font-medium">Tags (Optional)</Label>
             <Input
               id="tags"
@@ -109,47 +121,40 @@ const CreatePost = () => {
           
           <div className="space-y-2">
             <Label className="text-sm font-medium">Content</Label>
-            <Tabs defaultValue="write" className="w-full">
-              <TabsList className="mb-2">
-          <TabsTrigger value="write">Write</TabsTrigger>
-          <TabsTrigger value="preview">Preview</TabsTrigger>
-              </TabsList>
-              <TabsContent value="write" className="mt-0">
-          <Textarea
-            className="w-full min-h-[250px] bg-white editor-textarea border border-input px-3 py-2 placeholder:text-gray-500"
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Write your post content here..."
-            required
-          />
-              </TabsContent>
-              <TabsContent value="preview" className="mt-0">
-          <div className="editor-preview border rounded-md p-4 min-h-[250px] bg-white">
-            {content ? (
-              <div dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br />') }} />
-            ) : (
-              <p className="text-gray-400">Your content preview will appear here</p>
-            )}
+            <Textarea
+              className="w-full min-h-[250px] bg-white editor-textarea border border-input px-3 py-2 placeholder:text-gray-500"
+              id="content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Write your post content here..."
+              required
+            />
           </div>
-              </TabsContent>
-            </Tabs>
+
+          <div className="flex gap-4 mt-8">
+            <Button 
+              type="button" 
+              variant="outline"
+              onClick={() => navigate('/')}
+              className="w-full sm:w-auto px-6 py-2"
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={loading} 
+              className="w-full sm:w-auto px-6 py-2"
+            >
+              {loading ? (
+                <>
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  Publishing...
+                </>
+              ) : (
+                'Publish Post'
+              )}
+            </Button>
           </div>
-          
-          <Button 
-            type="submit" 
-            disabled={loading} 
-            className="w-full sm:w-auto px-6 py-2 mt-4"
-          >
-            {loading ? (
-              <>
-          <Loader className="mr-2 h-4 w-4 animate-spin" />
-          Publishing...
-              </>
-            ) : (
-              'Publish Post'
-            )}
-          </Button>
         </form>
       </div>
     </Layout>

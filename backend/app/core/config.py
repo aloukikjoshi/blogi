@@ -26,33 +26,36 @@ class Settings(BaseSettings):
     # Environment info
     ENV: str = ENV
     API_V1_STR: str = "/api/v1"
-    PROJECT_NAME: str = "Blogi API"
+    PROJECT_NAME: str = "commonminds API"
     
     # Database
-    DATABASE_URL: PostgresDsn = os.getenv("DATABASE_URL")
+    # Provide a sensible fallback so instantiating Settings() won't fail if env var is missing.
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./test.db")
     
     # JWT
-    SECRET_KEY: str = os.getenv("SECRET_KEY")
-    ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+    # Provide a fallback secret for local development; override via env in production.
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "change-me-in-production")
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
     # CORS
-    CORS_ORIGINS_STR: str = os.getenv("CORS_ORIGINS")
+    CORS_ORIGINS_STR: str = ""
     CORS_ORIGINS: List[str] = []
     
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v, info):
-        if isinstance(v, str):
-            if v.startswith("["):
+        cors_str = info.data.get("CORS_ORIGINS_STR", "")
+        if isinstance(cors_str, str):
+            if cors_str.startswith("["):
                 # JSON-formatted list
                 try:
-                    return json.loads(v)
+                    return json.loads(cors_str)
                 except json.JSONDecodeError:
                     return []
             else:
                 # Comma-separated string
-                return [i.strip() for i in v.split(",") if i.strip()]
+                return [i.strip() for i in cors_str.split(",") if i.strip()]
         elif isinstance(v, list):
             return v
         return []
@@ -60,6 +63,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+        case_sensitive = False
 
 settings = Settings()
 

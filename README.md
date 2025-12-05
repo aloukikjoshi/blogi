@@ -1,6 +1,6 @@
-# 🌟 Blogi
+# 🌟 commonminds
 
-Blogi is a modern blogging platform built to help writers share their stories with the world. ✍️  
+commonminds is a modern blogging platform built to help writers share their stories with the world. ✍️  
 [Live Demo 🌐](https://blogi-aloukikjoshis-projects.vercel.app/)
 
 ---
@@ -24,7 +24,7 @@ Blogi is a modern blogging platform built to help writers share their stories wi
 
 ## ✨ Overview
 
-Blogi is a full-stack web application designed to provide a seamless blogging experience. It offers:  
+commonminds is a full-stack web application designed to provide a seamless blogging experience. It offers:  
 - 🔐 **User registration and authentication**  
 - 📝 **Create, edit, and delete blog posts**  
 - 🔍 **Explore posts with pagination**  
@@ -294,7 +294,7 @@ Make sure that all these files and directories are in place before proceeding.
 
 ## 🌐 Deployment
 
-Blogi is fully deployed online for a seamless experience:  
+commonminds is fully deployed online for a seamless experience:  
 - **Frontend & Backend:** Deployed on [Vercel](https://vercel.com/).  
 - **Database:** Hosted on **Azure PostgreSQL** for reliable and scalable data storage. 
 

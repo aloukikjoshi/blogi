@@ -11,7 +11,7 @@ import { PostActions } from '@/components/posts/PostActions';
 import { Post as PostType, isApiError } from '@/types';
 
 const Post = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   // Replace any with PostType | null
   const [post, setPost] = useState<PostType | null>(null);
@@ -27,11 +27,11 @@ const Post = () => {
   // Load post data
   useEffect(() => {
     const loadPost = async () => {
-      if (!slug) return;
+      if (!id) return;
       
       try {
         setLoading(true);
-        const data = await fetchPost(slug);
+        const data = await fetchPost(id);
         setPost(data);
       } catch (err: unknown) {
         console.error('Failed to load post:', err);
@@ -42,13 +42,13 @@ const Post = () => {
     };
 
     loadPost();
-  }, [slug]);
+  }, [id]);
 
   if (loading) {
     return (
       <Layout>
         <div className="flex justify-center items-center py-32">
-          <Loader className="h-10 w-10 animate-spin text-blogi-600" />
+          <Loader className="h-10 w-10 animate-spin text-commonminds-600" />
         </div>
       </Layout>
     );
@@ -72,6 +72,15 @@ const Post = () => {
     <Layout>
       <article className="container mx-auto px-4 py-8 max-w-4xl">
         <header className="mb-8 relative">
+          {post.cover_image && (
+            <div className="mb-6 rounded-lg overflow-hidden aspect-video w-full">
+              <img 
+                src={post.cover_image} 
+                alt={post.title} 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
           {/* Post title */}
           <div className="flex justify-between items-start">
             <h1 className="text-4xl font-bold text-gray-900 mb-4 pr-12">

@@ -5,20 +5,10 @@ from app.models.post import Post, Tag
 from app.schemas.post import PostCreate, PostUpdate
 import re
 from datetime import datetime
-
-def slugify(title: str) -> str:
-    # Convert to lowercase and replace spaces with hyphens
-    slug = title.lower().strip()
-    slug = re.sub(r'[^\w\s-]', '', slug)
-    slug = re.sub(r'[\s_-]+', '-', slug)
-    slug = re.sub(r'^-+|-+$', '', slug)
-    return slug
+from uuid import uuid4
 
 def get_post(db: Session, post_id: str):
     return db.query(Post).filter(Post.id == post_id).first()
-
-def get_post_by_slug(db: Session, slug: str):
-    return db.query(Post).filter(Post.slug == slug).first()
 
 def get_posts(db: Session, skip: int = 0, limit: int = 100):
     total = db.query(func.count(Post.id)).scalar()
@@ -63,16 +53,6 @@ def search_posts(db: Session, query: str, skip: int = 0, limit: int = 100):
     }
 
 def create_post(db: Session, post: PostCreate, user_id: str):
-    # Create slug from title
-    base_slug = slugify(post.title)
-    slug = base_slug
-    
-    # Check if slug exists, if so, append a number
-    i = 1
-    while get_post_by_slug(db, slug):
-        slug = f"{base_slug}-{i}"
-        i += 1
-    
     # Process tags
     tag_objects = []
     if post.tags:
@@ -87,7 +67,7 @@ def create_post(db: Session, post: PostCreate, user_id: str):
         title=post.title,
         content=post.content,
         excerpt=post.excerpt if post.excerpt else post.content[:150] + "...",
-        slug=slug,
+        cover_image=post.cover_image,
         author_id=user_id,
         published_at=datetime.utcnow()
     )
@@ -103,26 +83,10 @@ def create_post(db: Session, post: PostCreate, user_id: str):
 def update_post(db: Session, post_id: str, post_update: PostUpdate, user_id: str):
     db_post = get_post(db, post_id)
     
-    if not db_post or db_post.author_id != user_id:
+    if db_post is None or db_post.author_id != user_id:
         return None
     
     update_data = post_update.dict(exclude_unset=True)
-    
-    # Update slug if title is being updated
-    if "title" in update_data:
-        base_slug = slugify(update_data["title"])
-        slug = base_slug
-        
-        # Check if slug exists and is not the same as the current one
-        i = 1
-        while True:
-            existing_post = get_post_by_slug(db, slug)
-            if not existing_post or existing_post.id == post_id:
-                break
-            slug = f"{base_slug}-{i}"
-            i += 1
-        
-        update_data["slug"] = slug
     
     # Update tags if needed
     if "tags" in update_data:
@@ -158,8 +122,10 @@ def delete_post(db: Session, post_id: str, user_id: str):
             print(f"Post {post_id} not found")
             return False
         
-        if db_post.author_id != user_id:
-            print(f"User {user_id} is not the author of post {post_id}. Author is {db_post.author_id}")
+        # retrieve the author_id as a scalar value to avoid SQLAlchemy ColumnElement comparisons in Python conditionals
+        db_author_id = db.query(Post.author_id).filter(Post.id == post_id).scalar()
+        if db_author_id != user_id:
+            print(f"User {user_id} is not the author of post {post_id}. Author is {db_author_id}")
             return False
         
         print(f"Deleting post {post_id}")

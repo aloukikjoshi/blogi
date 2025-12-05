@@ -16,7 +16,7 @@ export interface Post {
   title: string;
   content: string;
   excerpt?: string;
-  slug: string;
+  cover_image?: string;
   published_at: string;
   updated_at?: string; // Add this properly to your interface
   author: {
@@ -32,6 +32,7 @@ export type CreatePostData = {
   title: string;
   content: string;
   excerpt?: string;
+  cover_image?: string;
   tags?: string[];
 };
 
@@ -71,10 +72,10 @@ export const fetchPosts = async (page = 1, limit = 10, userId?: string) => {
   }
 };
 
-// Fetch a single post by ID or slug
-export const fetchPost = async (idOrSlug: string) => {
+// Fetch a single post by ID
+export const fetchPost = async (id: string) => {
   try {
-    const response = await fetch(`${API_URL}/posts/${idOrSlug}`);
+    const response = await fetch(`${API_URL}/posts/${id}`);
     
     if (!response.ok) {
       const error = await response.json();

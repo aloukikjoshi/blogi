@@ -113,7 +113,7 @@ const EditPost = () => {
     return (
       <Layout>
         <div className="flex justify-center items-center py-32">
-          <Loader className="h-10 w-10 animate-spin text-blogi-600" />
+          <Loader className="h-10 w-10 animate-spin text-commonminds-600" />
         </div>
       </Layout>
     );
@@ -195,20 +195,30 @@ const EditPost = () => {
             </div>
           )}
           
-          <Button 
-            type="submit" 
-            disabled={loading} 
-            className="w-full sm:w-auto px-6 py-2 mt-4"
-          >
-            {loading ? (
-              <>
-                <Loader className="mr-2 h-4 w-4 animate-spin" />
-                Updating...
-              </>
-            ) : (
-              'Update Post'
-            )}
-          </Button>
+          <div className="flex gap-4 mt-4">
+            <Button 
+              type="button" 
+              variant="outline"
+              onClick={() => navigate(`/post/${id}`)}
+              className="w-full sm:w-auto px-6 py-2"
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={loading} 
+              className="w-full sm:w-auto px-6 py-2"
+            >
+              {loading ? (
+                <>
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                'Update Post'
+              )}
+            </Button>
+          </div>
         </form>
       </div>
     </Layout>

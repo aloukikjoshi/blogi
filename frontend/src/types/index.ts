@@ -24,7 +24,6 @@ export type Post = {
     content: string;
     excerpt: string;
     published_at: string;
-    slug: string;
     author: PostAuthor;
     tags: PostTagType[];
     // Optional fields for UI normalization:

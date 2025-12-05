@@ -51,7 +51,7 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        blogi: {
+        commonminds: {
           50: "#ecfeff",
           100: "#cffafe",
           200: "#a5f3fc",

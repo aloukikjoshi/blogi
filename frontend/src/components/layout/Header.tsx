@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Menu, X, User, Settings, LogOut, Search, PenTool } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Header = () => {
   const { user, logout } = useAuth();
@@ -45,13 +46,13 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-serif font-bold text-blogi-800">Blogi</span>
+            <span className="text-2xl font-serif font-bold text-commonminds-800">commonminds</span>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-blogi-600 transition-colors">Home</Link>
-            <Link to="/explore" className="text-gray-700 hover:text-blogi-600 transition-colors">Explore</Link>
+            <Link to="/" className="text-gray-700 hover:text-commonminds-600 transition-colors">Home</Link>
+            <Link to="/explore" className="text-gray-700 hover:text-commonminds-600 transition-colors">Explore</Link>
           </nav>
 
           {/* User Menu (Desktop) */}
@@ -104,69 +105,103 @@ const Header = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-gray-700 p-2"
+            className="md:hidden text-gray-700 p-2 relative w-8 h-8"
             onClick={toggleMenu}
             aria-label="Toggle menu"
           >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            <AnimatePresence mode="wait">
+              {isMenuOpen ? (
+                <motion.div
+                  key="close"
+                  initial={{ opacity: 0, rotate: -90 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: 90 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <X size={24} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="menu"
+                  initial={{ opacity: 0, rotate: 90 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: -90 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <Menu size={24} />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </button>
         </div>
 
         {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden py-4 space-y-4">
-            <Link
-              to="/"
-              className="block py-2 text-center text-gray-700 hover:text-blogi-600"
-              onClick={() => setIsMenuOpen(false)}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="md:hidden overflow-hidden"
             >
-              Home
-            </Link>
-            <Link
-              to="/explore"
-              className="block py-2 text-center text-gray-700 hover:text-blogi-600"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Explore
-            </Link>
-            {user ? (
-              <>
+              <div className="py-4 space-y-4">
                 <Link
-                  to="/create-post"
-                  className="block py-2 text-center text-gray-700 hover:text-blogi-600"
+                  to="/"
+                  className="block py-2 text-center text-gray-700 hover:text-commonminds-600"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Write a Post
+                  Home
                 </Link>
                 <Link
-                  to={`/profile/${userId}`}
-                  className="block py-2 text-center text-gray-700 hover:text-blogi-600"
+                  to="/explore"
+                  className="block py-2 text-center text-gray-700 hover:text-commonminds-600"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Profile
+                  Explore
                 </Link>
-                <button
-                  onClick={() => {
-                    logout();
-                    setIsMenuOpen(false);
-                  }}
-                  className="w-full py-2 text-center text-gray-700 hover:text-blogi-600"
-                >
-                  Log out
-                </button>
-              </>
-            ) : (
-              <div className="flex flex-col space-y-2 pt-2">
-                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="outline" className="w-full">Log in</Button>
-                </Link>
-                <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full">Sign up</Button>
-                </Link>
+                {user ? (
+                  <>
+                    <Link
+                      to="/create-post"
+                      className="block py-2 text-center text-gray-700 hover:text-commonminds-600"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Write a Post
+                    </Link>
+                    <Link
+                      to={`/profile/${userId}`}
+                      className="block py-2 text-center text-gray-700 hover:text-commonminds-600"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full py-2 text-center text-gray-700 hover:text-commonminds-600"
+                    >
+                      Log out
+                    </button>
+                  </>
+                ) : (
+                  <div className="flex flex-col space-y-2 pt-2">
+                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" className="w-full">Log in</Button>
+                    </Link>
+                    <Link to="/register" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full">Sign up</Button>
+                    </Link>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </header>
   );

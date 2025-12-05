@@ -75,7 +75,7 @@ const PostGrid = ({
   if (loading && posts.length === 0) {
     return (
       <div className="flex justify-center items-center py-16">
-        <Loader className="h-8 w-8 animate-spin text-blogi-600" />
+        <Loader className="h-8 w-8 animate-spin text-commonminds-600" />
       </div>
     );
   }
@@ -120,8 +120,19 @@ const PostGrid = ({
               />
             )}
 
+            {post.cover_image && (
+              <Link to={`/post/${post.id}`}>
+                <div className="mb-4 rounded-md overflow-hidden aspect-video w-full">
+                  <img 
+                    src={post.cover_image} 
+                    alt={post.title} 
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+              </Link>
+            )}
             <h3 className="text-xl font-semibold mb-3 pr-8">
-              <Link to={`/post/${post.slug}`} className="hover:text-blogi-600 transition-colors">
+              <Link to={`/post/${post.id}`} className="hover:text-commonminds-600 transition-colors">
                 {post.title}
               </Link>
             </h3>
@@ -136,7 +147,7 @@ const PostGrid = ({
               <div>
                 <Link 
                   to={`/profile/${post.author.id}`}
-                  className="text-sm font-medium hover:text-blogi-600"
+                  className="text-sm font-medium hover:text-commonminds-600"
                 >
                   {post.author.username}
                 </Link>

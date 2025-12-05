@@ -42,7 +42,7 @@ const Index = () => {
     return (
       <Layout>
         <div className="flex justify-center items-center py-32">
-          <Loader className="h-10 w-10 animate-spin text-blogi-600" />
+          <Loader className="h-10 w-10 animate-spin text-commonminds-600" />
         </div>
       </Layout>
     );
@@ -65,13 +65,13 @@ const Index = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blogi-900 to-blogi-700 text-white py-16">
+      <section className="bg-gradient-to-r from-commonminds-900 to-commonminds-700 text-white py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
             Share Your Stories with the World
           </h1>
           <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-90">
-            Blogi is a platform for writers and readers to connect through the power of words.
+            commonminds is a platform for writers and readers to connect through the power of words.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/create-post">
@@ -80,7 +80,7 @@ const Index = () => {
               </Button>
             </Link>
             <Link to="/explore">
-                <Button variant="outline" size="lg" className="border-blogi-900 text-blogi-900 hover:bg-blogi-900 hover:text-white font-medium">
+                <Button variant="outline" size="lg" className="border-commonminds-900 text-commonminds-900 hover:bg-commonminds-900 hover:text-white font-medium">
                 Explore Posts
                 </Button>
             </Link>
@@ -103,7 +103,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900">Latest Posts</h2>
-            <Link to="/explore" className="text-blogi-600 hover:text-blogi-800 font-medium">
+            <Link to="/explore" className="text-commonminds-600 hover:text-commonminds-800 font-medium">
               View All
             </Link>
           </div>

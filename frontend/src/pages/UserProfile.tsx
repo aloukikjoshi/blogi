@@ -45,7 +45,7 @@ const UserProfile = () => {
     return (
       <Layout>
         <div className="flex justify-center items-center py-32">
-          <Loader className="h-10 w-10 animate-spin text-blogi-600" />
+          <Loader className="h-10 w-10 animate-spin text-commonminds-600" />
         </div>
       </Layout>
     );

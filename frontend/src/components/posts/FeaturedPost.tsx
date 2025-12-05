@@ -17,9 +17,10 @@ function isTagObject(tag: unknown): tag is TagObject {
 
 const FeaturedPost = ({ post }) => {
   const {
+    id,
     title,
     excerpt,
-    slug,
+    cover_image,
     published_at,
     author,
     tags = [],
@@ -36,7 +37,16 @@ const FeaturedPost = ({ post }) => {
   return (
     <article className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 transition-all hover:shadow-md">
       <div className="md:flex">
-        <div className="p-6 w-full flex flex-col">
+        {cover_image && (
+          <div className="md:w-1/3 h-48 md:h-auto relative">
+            <img 
+              src={cover_image} 
+              alt={title} 
+              className="w-full h-full object-cover absolute inset-0"
+            />
+          </div>
+        )}
+        <div className={`p-6 ${cover_image ? 'md:w-2/3' : 'w-full'} flex flex-col`}>
           <div className="flex-grow">
             {tags && tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-3">
@@ -47,7 +57,7 @@ const FeaturedPost = ({ post }) => {
                     <Link 
                       key={index} 
                       to={`/tag/${isTagObject(tag) ? tag.name : String(tag)}`}
-                      className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full hover:bg-blogi-100 transition-colors"
+                      className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full hover:bg-commonminds-100 transition-colors"
                     >
                       {isTagObject(tag) ? tag.name : String(tag)}
                     </Link>
@@ -56,7 +66,7 @@ const FeaturedPost = ({ post }) => {
             )}
             
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              <Link to={`/post/${slug}`} className="text-gray-900 hover:text-blogi-700 transition-colors">
+              <Link to={`/post/${id}`} className="text-gray-900 hover:text-commonminds-700 transition-colors">
                 {title}
               </Link>
             </h2>
@@ -80,7 +90,7 @@ const FeaturedPost = ({ post }) => {
               </Link>
             </div>
             
-            <Link to={`/post/${slug}`}>
+            <Link to={`/post/${id}`}>
               <Button variant="outline" className="w-full md:w-auto">
                 Read Full Article
               </Button>

@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from app.api.dependencies import get_current_user
 from app.core.database import get_db
-from app.crud.post import get_post, get_post_by_slug, get_posts, create_post, update_post, delete_post, search_posts
+from app.crud.post import get_post, get_posts, create_post, update_post, delete_post, search_posts
 from app.schemas.post import Post, PostCreate, PostUpdate, PostList
 from app.schemas.user import User
 
@@ -14,7 +14,8 @@ router = APIRouter()
 @router.get("/", response_model=PostList)
 async def read_posts(
     page: int = 1, 
-    limit: int = 10, 
+    limit: int = 10,
+    sort: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
     skip = (page - 1) * limit
@@ -40,14 +41,10 @@ async def create_post_endpoint(
 ):
     return create_post(db=db, post=post, user_id=current_user.id)
 
-@router.get("/{id_or_slug}", response_model=Post)
-async def read_post(id_or_slug: str, db: Session = Depends(get_db)):
+@router.get("/{post_id}", response_model=Post)
+async def read_post(post_id: str, db: Session = Depends(get_db)):
     # Try to find by ID first
-    post = get_post(db, post_id=id_or_slug)
-    
-    # If not found, try by slug
-    if post is None:
-        post = get_post_by_slug(db, slug=id_or_slug)
+    post = get_post(db, post_id=post_id)
     
     if post is None:
         raise HTTPException(

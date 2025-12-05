@@ -7,8 +7,8 @@ from app.core.config import settings
 from app.middleware.cors import VercelCORSMiddleware
 
 app = FastAPI(
-    title="Blogi API",
-    description="API for Blogi platform",
+    title="commonminds API",
+    description="API for commonminds platform",
     version="0.1.0",
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
@@ -23,4 +23,4 @@ app.include_router(posts.router, prefix=f"{settings.API_V1_STR}/posts", tags=["p
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to Blogi API"}
+    return {"message": "Welcome to commonminds API"}

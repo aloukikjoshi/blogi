@@ -9,9 +9,6 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
-import Cookies from "./pages/Cookies";
 import CreatePost from "./pages/CreatePost";
 import Logout from "./pages/Logout";
 import Explore from "./pages/Explore";
@@ -34,9 +31,6 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/cookies" element={<Cookies />} />
               <Route
                 path="/create-post"
                 element={
@@ -47,7 +41,7 @@ const App = () => (
               />
               <Route path="/logout" element={<Logout />} />
               <Route path="/explore" element={<Explore />} />
-              <Route path="/post/:slug" element={<Post />} />
+              <Route path="/post/:id" element={<Post />} />
               <Route
                 path="/edit/:id"
                 element={
