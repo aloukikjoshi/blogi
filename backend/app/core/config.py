@@ -1,6 +1,5 @@
 import os
 from typing import List
-
 from pydantic_settings import BaseSettings
 
 
@@ -13,15 +12,16 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     class Config:
-        # Do NOT load any .env files; only real environment variables
         env_file = None
         case_sensitive = False
 
 
 settings = Settings()  # type: ignore
 
-# Hard-coded CORS origins - set after Settings initialization to avoid env parsing
-settings.CORS_ORIGINS = [
+# CORS configuration
+CORS_ORIGINS = [
     "https://commonminds.vercel.app",
-    "https://commonminds-aloukikjoshis-projects.vercel.app"
+    "https://commonminds-aloukikjoshis-projects.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:8000",
 ]
