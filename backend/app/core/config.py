@@ -18,10 +18,3 @@ class Settings(BaseSettings):
 
 settings = Settings()  # type: ignore
 
-# CORS configuration
-CORS_ORIGINS = [
-    "https://commonminds.vercel.app",
-    "https://commonminds-aloukikjoshis-projects.vercel.app",
-    "http://localhost:5173",
-    "http://localhost:8000",
-]

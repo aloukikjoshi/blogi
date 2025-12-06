@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.endpoints import auth, users, posts
-from app.core.config import settings, CORS_ORIGINS
+from app.core.config import settings
 
 app = FastAPI(
     title="commonminds API",
@@ -11,10 +11,17 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
+# CORS configuration
+origins = [
+    "https://commonminds.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:8000",
+]
+
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
