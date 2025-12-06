@@ -2,16 +2,10 @@ import os
 from typing import List
 
 from pydantic_settings import BaseSettings
+from pydantic import Field
 
 
 class Settings(BaseSettings):
-    """Application settings loaded only from environment variables.
-
-    Expected environment variables (e.g. in Vercel):
-      - DATABASE_URL
-      - SECRET_KEY
-      - CORS_ORIGINS (optional: single URL or comma-separated list)
-    """
 
     # Basic API metadata
     API_V1_STR: str = "/api/v1"
@@ -25,13 +19,16 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
-    # Hard-coded CORS origins
-    CORS_ORIGINS: List[str] = [
-        "https://commonminds.vercel.app",
-        "https://commonminds-aloukikjoshis-projects.vercel.app",
-        "http://localhost:8000",   # optional, for local dev if needed
-        "http://localhost:5173",   # optional, Vite dev
-    ]
+    # Hard-coded CORS origins (exclude from env parsing)
+    CORS_ORIGINS: List[str] = Field(
+        default=[
+            "https://commonminds.vercel.app",
+            "https://commonminds-aloukikjoshis-projects.vercel.app",
+            "http://localhost:8000",
+            "http://localhost:5173",
+        ],
+        exclude=True,  # Don't try to read from environment
+    )
 
     class Config:
         # Do NOT load any .env files; only real environment variables
