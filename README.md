@@ -79,6 +79,52 @@ commonminds is fully deployed online for a seamless experience:
 
 ---
 
+## ⚡ Challenges and Solutions
+
+### **Handling CORS Origins Errors**
+
+**Challenge:**  
+During development, the application encountered Cross-Origin Resource Sharing (CORS) errors when the frontend tried to communicate with the backend API. This prevented the client-side application from making successful API requests, resulting in blocked network calls and failed data fetching.
+
+**Why It Occurred:**  
+CORS errors occur when a web application running on one domain (origin) attempts to make requests to a server on a different domain. In this project:
+- The **frontend** was running on `http://localhost:5173` during local development and `https://commonminds.vercel.app` in production
+- The **backend API** was running on a separate domain/port (`http://localhost:8000` locally and Vercel deployment URL in production)
+- By default, browsers block cross-origin requests for security reasons unless the server explicitly allows them
+
+**Solution Implemented:**  
+The issue was resolved by configuring FastAPI's CORS middleware to explicitly allow requests from trusted origins. In the backend's `main.py` file, the following configuration was added:
+
+```python
+from fastapi.middleware.cors import CORSMiddleware
+
+# CORS configuration
+origins = [
+    "https://commonminds.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:8000",
+]
+
+# Enable CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+**Technical Details:**
+- `allow_origins`: Specifies the list of allowed origins (domains) that can make requests to the API
+- `allow_credentials`: Enables sending cookies and authentication credentials with cross-origin requests
+- `allow_methods=["*"]`: Allows all HTTP methods (GET, POST, PUT, DELETE, etc.)
+- `allow_headers=["*"]`: Allows all HTTP headers in requests
+
+This configuration ensures smooth communication between the frontend and backend in both development and production environments while maintaining security by only allowing requests from specified trusted origins.
+
+---
+
 ## 💌 Support
 
 If you encounter any issues or have questions, feel free to reach out:  
