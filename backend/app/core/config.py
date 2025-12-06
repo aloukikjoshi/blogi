@@ -64,10 +64,6 @@ class Settings(BaseSettings):
     SECRET_KEY: str = os.getenv("SECRET_KEY", "change-me-in-production")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    
-    # CORS - Plain string that we'll parse
-    CORS_ORIGINS_STR: str = os.getenv("CORS_ORIGINS", "*")
-    CORS_ORIGINS: List[str] = ["*"]  # Initialize with default
 
     class Config:
         env_file = ".env"
@@ -76,9 +72,10 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-# Parse CORS origins after settings initialization
+# Parse CORS origins separately (NOT as a Pydantic field to avoid JSON parsing)
 try:
-    settings.CORS_ORIGINS = parse_cors_origins(settings.CORS_ORIGINS_STR)
+    cors_env = os.getenv("CORS_ORIGINS", "*")
+    settings.CORS_ORIGINS = parse_cors_origins(cors_env)
 except Exception as e:
     print(f"Error parsing CORS origins: {e}")
     settings.CORS_ORIGINS = ["*"]
