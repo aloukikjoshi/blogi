@@ -47,9 +47,6 @@ const CreatePost = () => {
         cover_image: coverImage || undefined,
         tags: tagsArray.length > 0 ? tagsArray : undefined
       };
-      
-      const newPost = await createPost(postData);
-      
       toast({
         title: "Post created successfully",
         description: "Your post has been published"

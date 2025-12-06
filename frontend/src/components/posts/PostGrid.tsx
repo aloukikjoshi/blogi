@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Post, fetchPosts, fetchUserPosts } from '@/services/api';
 import { Button } from '@/components/ui/button';
-import { Loader, Edit2 } from 'lucide-react';
-import { DeletePostButton } from '@/components/posts/DeletePostButton';
+import { Loader } from 'lucide-react';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link } from 'react-router-dom';
@@ -29,7 +28,7 @@ const PostGrid = ({
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   
-  const loadPosts = async (pageNum = 1) => {
+  const loadPosts = useCallback(async (pageNum = 1) => {
     setLoading(true);
     setError(null);
     
@@ -57,14 +56,14 @@ const PostGrid = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
   
   useEffect(() => {
     // Reload posts when userId changes or when not using initialPosts
     if (!initialPosts) {
       loadPosts(1);
     }
-  }, [initialPosts, userId]); // Add userId dependency
+  }, [initialPosts, userId, loadPosts]);
   
   const handleLoadMore = () => {
     const nextPage = page + 1;

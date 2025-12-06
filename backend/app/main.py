@@ -1,10 +1,8 @@
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-import os
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.endpoints import auth, users, posts
 from app.core.config import settings
-from app.middleware.cors import VercelCORSMiddleware
 
 app = FastAPI(
     title="commonminds API",
@@ -13,8 +11,14 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
-# Add our custom Vercel-compatible CORS middleware
-app.add_middleware(VercelCORSMiddleware)
+# Enable CORS based on settings
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS or ["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Include API routes
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["authentication"])

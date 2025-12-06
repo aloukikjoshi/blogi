@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import Optional
-from uuid import uuid4
 
 from app.api.dependencies import get_current_user
 from app.core.database import get_db
-from app.crud.post import get_post, get_posts, create_post, update_post, delete_post, search_posts
+from app.crud.post import get_post, get_posts, create_post, update_post, delete_post
 from app.schemas.post import Post, PostCreate, PostUpdate, PostList
 from app.schemas.user import User
 
@@ -20,17 +19,6 @@ async def read_posts(
 ):
     skip = (page - 1) * limit
     posts = get_posts(db, skip=skip, limit=limit)
-    return posts
-
-@router.get("/search", response_model=PostList)
-async def search_posts_endpoint(
-    q: str,
-    page: int = 1,
-    limit: int = 10,
-    db: Session = Depends(get_db)
-):
-    skip = (page - 1) * limit
-    posts = search_posts(db, query=q, skip=skip, limit=limit)
     return posts
 
 @router.post("/", response_model=Post, status_code=status.HTTP_201_CREATED)

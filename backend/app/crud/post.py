@@ -1,11 +1,8 @@
-from typing import List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models.post import Post, Tag
 from app.schemas.post import PostCreate, PostUpdate
-import re
 from datetime import datetime
-from uuid import uuid4
 
 def get_post(db: Session, post_id: str):
     return db.query(Post).filter(Post.id == post_id).first()
@@ -24,26 +21,6 @@ def get_posts(db: Session, skip: int = 0, limit: int = 100):
 def get_posts_by_user(db: Session, user_id: str, skip: int = 0, limit: int = 100):
     total = db.query(func.count(Post.id)).filter(Post.author_id == user_id).scalar()
     posts = db.query(Post).filter(Post.author_id == user_id).order_by(Post.published_at.desc()).offset(skip).limit(limit).all()
-    return {
-        "items": posts,
-        "total": total,
-        "page": skip // limit + 1,
-        "size": limit,
-        "pages": (total + limit - 1) // limit
-    }
-
-def search_posts(db: Session, query: str, skip: int = 0, limit: int = 100):
-    search = f"%{query}%"
-    total = db.query(func.count(Post.id)).filter(
-        (Post.title.ilike(search)) | 
-        (Post.content.ilike(search))
-    ).scalar()
-    
-    posts = db.query(Post).filter(
-        (Post.title.ilike(search)) | 
-        (Post.content.ilike(search))
-    ).order_by(Post.published_at.desc()).offset(skip).limit(limit).all()
-    
     return {
         "items": posts,
         "total": total,
@@ -83,7 +60,7 @@ def create_post(db: Session, post: PostCreate, user_id: str):
 def update_post(db: Session, post_id: str, post_update: PostUpdate, user_id: str):
     db_post = get_post(db, post_id)
     
-    if db_post is None or db_post.author_id != user_id:
+    if db_post is None or db.query(Post.author_id).filter(Post.id == post_id).scalar() != user_id:
         return None
     
     update_data = post_update.dict(exclude_unset=True)

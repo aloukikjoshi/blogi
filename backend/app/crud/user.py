@@ -4,17 +4,26 @@ from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 from app.core.security import get_password_hash, verify_password
 
-def get_user(db: Session, user_id: str):
-    return db.query(User).filter(User.id == user_id).first()
+def get_user(
+    db: Session,
+    *,
+    user_id: Optional[str] = None,
+    email: Optional[str] = None,
+    username: Optional[str] = None,
+):
+    provided_filters = [param is not None for param in (user_id, email, username)]
+    if not any(provided_filters):
+        raise ValueError("At least one identifier must be provided to get_user")
 
-def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
+    query = db.query(User)
+    if user_id is not None:
+        query = query.filter(User.id == user_id)
+    if email is not None:
+        query = query.filter(User.email == email)
+    if username is not None:
+        query = query.filter(User.username == username)
 
-def get_user_by_username(db: Session, username: str):
-    return db.query(User).filter(User.username == username).first()
-
-def get_users(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(User).offset(skip).limit(limit).all()
+    return query.first()
 
 def create_user(db: Session, user: UserCreate):
     try:
@@ -35,7 +44,7 @@ def create_user(db: Session, user: UserCreate):
         raise e
 
 def update_user(db: Session, user_id: str, user: UserUpdate):
-    db_user = get_user(db, user_id)
+    db_user = get_user(db, user_id=user_id)
     if not db_user:
         return None
     
@@ -52,7 +61,7 @@ def update_user(db: Session, user_id: str, user: UserUpdate):
     return db_user
 
 def authenticate_user(db: Session, username: str, password: str):
-    user = get_user_by_username(db, username)
+    user = get_user(db, username=username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):

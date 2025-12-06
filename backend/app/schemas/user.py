@@ -22,7 +22,7 @@ class UserInDB(UserBase):
     created_at: datetime  # Add created_at field here
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class User(UserInDB):
     pass

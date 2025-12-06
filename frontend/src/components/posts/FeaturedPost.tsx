@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Post } from '@/services/api';
 import { formatDistanceToNow } from 'date-fns';
 
 // Define a type for tag objects

@@ -13,11 +13,6 @@ type User = {
   avatar?: string;
 };
 
-type LoginCredentials = {
-  username: string;
-  password: string;
-};
-
 interface AuthContextType {
   user: User | null;
   token: string | null;
