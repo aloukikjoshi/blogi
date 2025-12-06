@@ -8,7 +8,8 @@ app = FastAPI(
     title="commonminds API",
     description="API for commonminds platform",
     version="0.1.0",
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    debug=True  # Enable debug mode to see 500 errors in response
 )
 
 # CORS configuration
