@@ -38,27 +38,44 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
-    # CORS
-    CORS_ORIGINS_STR: str = ""
+    # CORS - Support multiple formats: JSON array, comma-separated, or single URL
+    CORS_ORIGINS_STR: str = os.getenv("CORS_ORIGINS", "*")
     CORS_ORIGINS: List[str] = []
     
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v, info):
-        cors_str = info.data.get("CORS_ORIGINS_STR", "")
+        cors_str = info.data.get("CORS_ORIGINS_STR", "*")
+        
+        # If already a list, return it
+        if isinstance(v, list):
+            return v if v else ["*"]
+        
+        # Handle string input
         if isinstance(cors_str, str):
-            if cors_str.startswith("["):
-                # JSON-formatted list
+            cors_str = cors_str.strip()
+            
+            # JSON-formatted list: ["http://...", "http://..."]
+            if cors_str.startswith("[") and cors_str.endswith("]"):
                 try:
-                    return json.loads(cors_str)
-                except json.JSONDecodeError:
-                    return []
-            else:
-                # Comma-separated string
-                return [i.strip() for i in cors_str.split(",") if i.strip()]
-        elif isinstance(v, list):
-            return v
-        return []
+                    parsed = json.loads(cors_str)
+                    if isinstance(parsed, list) and parsed:
+                        return parsed
+                except (json.JSONDecodeError, ValueError):
+                    pass
+            
+            # Single URL or wildcard
+            if cors_str and cors_str != "*":
+                return [cors_str]
+            
+            # Comma-separated: "http://localhost:3000, https://example.com"
+            if "," in cors_str:
+                urls = [i.strip() for i in cors_str.split(",") if i.strip()]
+                if urls:
+                    return urls
+        
+        # Fallback to allow all origins
+        return ["*"]
 
     class Config:
         env_file = ".env"
